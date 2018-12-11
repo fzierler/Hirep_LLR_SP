@@ -1,0 +1,269 @@
+/*************************************************************************** \
+ * Copyright (c) 2008, Claudio Pica                                          *   
+ * All rights reserved.                                                      * 
+\***************************************************************************/
+
+/*******************************************************************************
+ *
+ * File update_llr.c
+ *
+ * Update programs
+ *
+ *******************************************************************************/
+#include "suN.h"
+#include "utils.h"
+#include "global.h"
+#include "logger.h"
+#include "random.h"
+#include "communications.h"
+#include <math.h>
+#include "update.h"
+#include "observables.h"
+#include <stdlib.h>
+#include "llr.h"
+
+typedef struct {
+  int nrm,nth;
+  double it;
+  double starta;
+  const mon_llr_par *mymon;
+} llrparams;
+
+
+
+
+static llrparams llrp;
+
+//reset it to 0 and rhoa to initial value
+void restart_robbinsmonro(){
+  llrp.it=8.;
+  *(llrp.mymon->fpar.a)=llrp.starta;
+}
+
+void init_robbinsmonro(int nrm,int nth){
+  llrp.nrm=nrm;
+  llrp.nth=nth;
+  llrp.it=8.;
+  
+  int counter=0;
+  
+  int nmon=num_mon();
+  for (int i=0;i<nmon;++i) {
+    const monomial *m=mon_n(i);
+    if(m->data.type==LLR) {
+      counter++;
+      llrp.mymon=m->force_par;
+    }
+  }
+  llrp.starta=*(llrp.mymon->fpar.a);  
+  error(counter!=1,1,"init_robbinsmonro","The actual implementation of LLR admits only one llr monomial\n");
+  
+}
+  
+double getrho(void){
+  return *llrp.mymon->fpar.a;	
+}
+
+double getezero(void){
+  return *llrp.mymon->fpar.E0;	
+}
+
+double getde(void){
+  return *llrp.mymon->fpar.de;	
+}
+
+
+
+void thermrobbinsmonro(void){
+  double *E0=llrp.mymon->fpar.E0;
+  double *de=llrp.mymon->fpar.de;
+  double *a=llrp.mymon->fpar.a;
+  
+  update_llr_ghmc(a,E0,de,1);
+
+}
+
+void llr_fix_a_update(void){
+  double *E0=llrp.mymon->fpar.E0;
+  double *de=llrp.mymon->fpar.de;
+  double *a=llrp.mymon->fpar.a;
+  
+  update_llr_ghmc(a,E0,de,0);
+
+  
+#ifdef WITH_UMBRELLA
+  double E=avr_plaquette()*GLB_VOLUME;
+  umbrella_swap(&E,llrp.mymon->fpar.E0,llrp.mymon->fpar.a,llrp.mymon->fpar.de);
+#endif
+
+
+}
+
+
+	
+void robbinsmonro(void){
+  
+  int rmstep;
+  
+  double *E0=llrp.mymon->fpar.E0;
+  double *de=llrp.mymon->fpar.de;
+  double *a=llrp.mymon->fpar.a;
+
+  
+  
+  
+  for(rmstep=0;rmstep<llrp.nth;rmstep++){
+    lprintf("llr",30,"Therm: %d\n",rmstep);
+    update_llr_ghmc(a,E0,de,1);
+
+  }
+  
+  double avr=0.;
+  
+  
+
+  for(rmstep=0;rmstep<llrp.nrm;rmstep++){
+    lprintf("llr",30,"Iter: %d\n",rmstep);
+    update_llr_ghmc(a,E0,de,0);
+    
+    double temp=avr_plaquette();
+    lprintf("llr",10,"Iter: %d Plaq=%lf \n",rmstep,temp);
+    avr+=temp;
+    
+  }
+  
+  avr/=(double)llrp.nrm;
+  
+  double De=avr*6.0*GLB_VOLUME-*E0;
+  *a-=De*12./((*de)*(*de)*llrp.it);
+#ifdef WITH_UMBRELLA
+  double E=avr_plaquette()*GLB_VOLUME;
+  umbrella_swap(&E,llrp.mymon->fpar.E0,llrp.mymon->fpar.a,llrp.mymon->fpar.de);
+#endif
+  llrp.it++;
+}
+
+
+typedef struct{
+  double dh;
+  int rep;
+  int repnext;
+
+} repdh;
+
+
+#ifdef WITH_UMBRELLA
+static int compare(const void *p, const void *q) {
+  //lprintf("llr:compare",0,"inside compare \n");
+  repdh x=*(repdh *)p;
+  repdh y=*(repdh *)q;
+
+
+  if (x.dh < y.dh )
+    return -1;  // Return -1 if you want ascending, 1 if you want descending order. 
+  else if (x.dh > y.dh )
+    return 1;   // Return 1 if you want ascending, -1 if you want descending order. 
+
+  return 0;
+}
+
+
+void swap(double *data){
+  repdh drep[N_REP-1];
+  int toswap[N_REP];
+  repdh energyz[N_REP];
+  double rand,temp;
+  int i,j;
+
+  toswap[N_REP-1]=1;
+
+  //sorting the replicas with respect of their energy  E0 so we can swap nearest neighbourgh
+
+  for(i=0;i<N_REP;i++){
+    energyz[i].dh=data[4*i+1];
+    energyz[i].rep=i;
+
+  }
+
+  qsort(energyz,N_REP,sizeof(energyz[0]),compare);
+
+  //sorting with respect of the difference in hamiltonian between r and r+1 where r is the replica
+
+  for(i=0;i<N_REP-1;i++){
+    toswap[i]=1;
+    drep[i].rep=energyz[i].rep;
+    drep[i].repnext=energyz[i+1].rep;
+    drep[i].dh=1./(data[energyz[i].rep*4+3]*data[energyz[i].rep*4+3])*(data[energyz[i].rep*4+1]-data[energyz[i+1].rep*4+1])*(-data[energyz[i+1].rep*4]+data[energyz[i].rep*4])+(data[energyz[i+1].rep*4]-data[energyz[i].rep*4])*(data[energyz[i+1].rep*4+2]-data[energyz[i].rep*4+2]);
+  }
+  
+  qsort(drep,N_REP-1,sizeof(drep[0]),compare);
+  
+
+  //swapping of replicas
+  /*
+    for(i=0;i<N_REP-1;i++){
+    if(drep[i].dh<0 && toswap[drep[i].rep] && toswap[drep[i].repnext] ){
+    toswap[drep[i].rep]=0;
+    toswap[drep[i].repnext]=0;
+    //lprintf("llr:swap",0,"dh<0 swapping Rep %d with E0=%lf with Rep %d with E0=%lf \n",drep[i].rep,data[4*drep[i].rep+1],drep[i].repnext,data[4*drep[i].repnext+1]); 
+    for(j=0;j<4;j++){                                                                                                                                                                                                                      
+    temp=data[4*drep[i].rep+j];                                                                                                                                                                                                                      
+    data[4*drep[i].rep+j]=data[4*drep[i].repnext+j];                                                                                                                                                                                                           
+    data[4*drep[i].repnext+j]=temp; 
+      }
+      }else{ 
+      if(toswap[drep[i].rep]==1 && toswap[drep[i].repnext])
+      {
+      ranlxd(&rand,1);
+      if(rand < exp(-drep[i].dh)){
+      //lprintf("llr:swap",0,"dh<0 swapping Rep %d with E0=%lf with Rep %d with E0=%lf \n",drep[i].rep,data[4*drep[i].rep+1],drep[i].repnext,data[4*drep[i].repnext+1]);   
+      toswap[drep[i].rep]=0;
+      toswap[drep[i].repnext]=0;
+      for(j=0;j<4;j++){                                                                                                                                                                                                                      
+      temp=data[4*drep[i].rep+j];                                                                                                                                                                                                                      
+      data[4*drep[i].rep+j]=data[4*drep[i].repnext+j];                                                                                                                                                                                                           
+      data[4*drep[i].repnext+j]=temp; 
+      }	  
+      
+      }
+      }
+      }
+      }*/
+  
+  for(i=0;i<N_REP-1;i++){
+    if(toswap[drep[i].rep] && toswap[drep[i].repnext] ){
+      toswap[drep[i].rep]=0;
+      toswap[drep[i].repnext]=0;
+      if(drep[i].dh<0){
+	for(j=0;j<4;j++){                                                                                                                                                                                                                      
+	  temp=data[4*drep[i].rep+j];                                                                                                                                                                                                                      
+	  data[4*drep[i].rep+j]=data[4*drep[i].repnext+j];                                                                                                                                                                                                           
+	  data[4*drep[i].repnext+j]=temp; 
+	}
+	
+      }else{
+	ranlxd(&rand,1);
+	if(rand < exp(-drep[i].dh)){
+	  for(j=0;j<4;j++){                                                                                                                                                                                                                      
+	    temp=data[4*drep[i].rep+j];                                                                                                                                                                                                                      
+	    data[4*drep[i].rep+j]=data[4*drep[i].repnext+j];                                                                                                                                                                                                           
+	    data[4*drep[i].repnext+j]=temp; 
+	  }	
+	}
+      }
+    }
+  }
+}
+
+
+void setreplica(double *data){
+  lprintf("llr:setreplica",0,"Updating OLD LLR Param: E0 %lf,  a  %lf , de %lf  \n",*(llrp.mymon->fpar.E0),*(llrp.mymon->fpar.a),*(llrp.mymon->fpar.de));
+  *(llrp.mymon->fpar.E0)=data[RID*4+1];
+  *(llrp.mymon->fpar.de)=data[RID*4+3];
+  *(llrp.mymon->fpar.a)=data[RID*4+2];
+  
+  lprintf("llr:setreplica",0,"New LLR Param: E0 %lf,  a  %lf , de %lf  \n",*(llrp.mymon->fpar.E0),*(llrp.mymon->fpar.a),*(llrp.mymon->fpar.de));
+  
+}
+
+#endif //WITH_UMBRELLA

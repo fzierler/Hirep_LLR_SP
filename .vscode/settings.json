@@ -1,0 +1,25 @@
+{
+    "files.associations": {
+        "iterator": "c",
+        "string": "c",
+        "string_view": "c",
+        "vector": "c",
+        "logger.h": "c",
+        "memory.h": "c",
+        "representation.h": "c",
+        "update.h": "c",
+        "__bit_reference": "c",
+        "__functional_03": "c",
+        "__mutex_base": "c",
+        "fstream": "c",
+        "functional": "c",
+        "ios": "c",
+        "istream": "c",
+        "memory": "c",
+        "ostream": "c",
+        "sstream": "c",
+        "streambuf": "c",
+        "tuple": "c"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
+}

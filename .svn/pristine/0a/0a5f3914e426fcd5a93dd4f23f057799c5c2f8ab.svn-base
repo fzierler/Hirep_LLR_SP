@@ -1,0 +1,73 @@
+// Global variables 
+GLB_T = 8
+GLB_X = 8
+GLB_Y = 8
+GLB_Z = 8
+NP_T = 1
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+BC_SHIFT_X=1
+BC_SHIFT_Y=0
+BC_SHIFT_Z=0
+// Replicas
+N_REP = 1
+
+// Random generator
+rlx_level = 1
+rlx_seed = 13813
+rlx_start = new
+rlx_state = rand_state
+
+// Logger levels
+log:default = 30
+log:inverter = -1
+log:forcestat = 0
+
+// Fermion twisting
+theta_T = 0.
+theta_X = 0.
+theta_Y = 0.
+theta_Z = 0.
+
+// HMC variables
+tlen = 1.0
+
+// Schroedinger functional
+SF_zf = 1.
+SF_ds = 1.
+SF_ct = 1.
+SF_sign = 1
+
+// Runtime variables
+//example: run1_8x8x8x8nc2rFUNnf0b0.000000m0.000000
+therm =50
+run name = run1
+config dir = Cnfg
+gauge start = unit
+last RM it = +100
+rm restart = 1
+// LLR
+llr:make = true
+llr:nmc = 10
+llr:nth = 10
+ 
+
+// Monomials
+monomial {
+	id = 0
+	type = llr
+	E0 = 22550.  
+	de = 25.
+	arho = 2.1267083842999983
+	level = 0
+}
+
+
+integrator {
+	level = 0
+	type = o2mn
+	steps = 10
+}
+
+
