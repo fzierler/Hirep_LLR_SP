@@ -249,7 +249,7 @@ int main(int argc,char *argv[]) {
       thermrobbinsmonro();
       gettimeofday(&end,0);
       timeval_subtract(&etime,&end,&start);
-      lprintf("MAIN",0,"RM%d Thermalization Plaquette: %1.8e\n",j,avr_plaquette());
+      lprintf("MAIN",0,"RM%d Thermalization Plaquette: %lf\n",j,avr_plaquette());
       lprintf("MAIN",0,"RM%d Thermalization step #%d/%d: generated in [%ld sec %ld usec]\n",j,i,rmtherm,etime.tv_sec,etime.tv_usec);    
       
       

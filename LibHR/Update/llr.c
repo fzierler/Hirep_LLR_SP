@@ -47,6 +47,7 @@ void init_robbinsmonro(int nrm, int nth, double starta, int it, int swap, double
   llrp.it = it;
   llrp.umb_freq = swap;
   llrp.starta = starta;
+  llrp.a = starta;
   llrp.dS = dS;
   llrp.S0 = S0;
 }
