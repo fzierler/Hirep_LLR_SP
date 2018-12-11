@@ -126,7 +126,7 @@ static void read_cmdline(int argc, char* argv[]) {
 int main(int argc,char *argv[]) {
   struct timeval startmain, endmain, etimemain; /* //for trajectory timing */
   gettimeofday(&startmain,0);
-  int i;
+  int i,j;
   char sbuf[128];
 
   read_cmdline(argc,argv);
@@ -227,7 +227,7 @@ int main(int argc,char *argv[]) {
 
   for (i=1;i<=flow.therm;++i){
     struct timeval start, end, etime; /* //for trajectory timing */
-    lprintf("MAIN",0,"Initial Thermalization step #%d/%d...\n",i,flow.therm);
+    lprintf("MAIN",0,"Initial Thermalization step #%d/%d\n",i,flow.therm);
     gettimeofday(&start,0);
     thermrobbinsmonro();
     gettimeofday(&end,0);
@@ -237,14 +237,14 @@ int main(int argc,char *argv[]) {
   }
 
   int rmtherm = flow.therm/10;
-  int j;
+  
   for(j=0;j<flow.rmrestart;++j) {
     
     restart_robbinsmonro(llr_var.it);  
     
-    for (i=0;i<rmtherm;++i){
+    for (i=1;i<=rmtherm;++i){
       struct timeval start, end, etime; /* //for trajectory timing */
-      lprintf("MAIN",0,"RM%d Thermalization step #%d/%d...\n",j,i,rmtherm);
+      lprintf("MAIN",0,"RM%d Thermalization step #%d/%d\n",j,i,rmtherm);
       gettimeofday(&start,0);
       thermrobbinsmonro();
       gettimeofday(&end,0);
@@ -275,7 +275,7 @@ int main(int argc,char *argv[]) {
 
     for(i=flow.start;i<flow.end;++i) {
       struct timeval start, end, etime; /* //for trajectory timing */
-      lprintf("MAIN",0,"RM%d sequence #%d...\n",j,i);
+      lprintf("MAIN",0,"RM%d sequence #%d/%d\n",j,i,flow.end-flow.start);
       
       gettimeofday(&start,0);
       
@@ -295,20 +295,20 @@ int main(int argc,char *argv[]) {
       robbinsmonro();
       gettimeofday(&end,0);
       timeval_subtract(&etime,&end,&start);
-      lprintf("MAIN",0,"RM%d sequence #%d/%d: generated in [%ld sec %ld usec]\n",j,i,flow.end-flow.start,etime.tv_sec,etime.tv_usec);
-    
       lprintf("MAIN",0,"RM%d sequence %d Plaquette: %lf \n",j,i,avr_plaquette());    
       lprintf("MAIN",0,"<a_rho(%d,%d,%lf)>= %f\n",j,i,getS0(),get_llr_a());
+      lprintf("MAIN",0,"RM%d sequence #%d/%d: generated in [%ld sec %ld usec]\n",j,i,flow.end-flow.start,etime.tv_sec,etime.tv_usec);
+ 
     }
     
     
     
     lprintf("MAIN",0,"RM%d done. Final S0= %lf a_llr= %f\n",j,getS0(),get_llr_a());
     
-    for(i=flow.end;i<flow.end+flow.obsnmeas;++i) {
+    for(i=0;i<flow.obsnmeas;++i) {
       struct timeval start, end, etime; /* //for trajectory timing */
 
-      lprintf("MAIN",0,"RM%d Trajectory #%d...\n",j,i);
+      lprintf("MAIN",0,"RM%d Trajectory #%d of %d\n",j,i,flow.obsnmeas);
         
       gettimeofday(&start,0);
     
@@ -378,7 +378,7 @@ int main(int argc,char *argv[]) {
         }
         gettimeofday(&end,0);
         timeval_subtract(&etime,&end,&start);
-        lprintf("MAIN",0,"RM%d Measurements #%d performed in [%ld sec %ld usec]\n",j,i,etime.tv_sec,etime.tv_usec);
+        lprintf("MAIN",0,"RM%d Measurements on trajectory %d performed in [%ld sec %ld usec]\n",j,i,etime.tv_sec,etime.tv_usec);
       }
 
 
