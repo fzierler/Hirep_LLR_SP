@@ -230,7 +230,7 @@ void swap(double *data)
       toswap[drep[i].repnext] = 0;
       if (drep[i].deltaS < 0)
       {
-        for (j = 0; j < 4; j++)
+        for (j = 0; j < 5; j++)
         {
           temp = data[4 * drep[i].rep + j];
           data[4 * drep[i].rep + j] = data[4 * drep[i].repnext + j];
@@ -242,7 +242,7 @@ void swap(double *data)
         ranlxd(&rand, 1);
         if (rand < exp(-drep[i].deltaS))
         {
-          for (j = 0; j < 4; j++)
+          for (j = 0; j < 5; j++)
           {
             temp = data[4 * drep[i].rep + j];
             data[4 * drep[i].rep + j] = data[4 * drep[i].repnext + j];
