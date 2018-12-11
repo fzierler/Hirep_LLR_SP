@@ -191,16 +191,16 @@ int main(int argc,char *argv[]) {
 
   init_mc(&flow, input_filename);
   
-  lprintf("MAIN",0,"Thermalization steps: %d\n",flow.therm);
+  lprintf("MAIN",0,"Initial Thermalization steps: %d\n",flow.therm);
   lprintf("MAIN",0,"RM steps: %d\n",flow.end-flow.start);
   lprintf("MAIN",0,"RM global restart: %d\n",flow.rmrestart);
-  lprintf("MAIN",0,"Observable measures after RM: %d\n",flow.obsnmeas);
+  lprintf("MAIN",0,"Observable measurements after RM: %d\n",flow.obsnmeas);
   
   /* read input for llr update */
   read_input(llr_var.read,input_filename);
 
-  lprintf("MAIN",0,"LLR nunber of mc steps per RM: %d\n",llr_var.nmc);
-  lprintf("MAIN",0,"LLR nunber of therm steps per RM %d\n",llr_var.nth);
+  lprintf("MAIN",0,"LLR number of mc steps per RM: %d\n",llr_var.nmc);
+  lprintf("MAIN",0,"LLR number of therm steps per RM %d\n",llr_var.nth);
   lprintf("MAIN",0,"LLR Initial a %f\n",llr_var.starta);
   lprintf("MAIN",0,"LLR RM start value iteration %d\n",llr_var.it);
   lprintf("MAIN",0,"LLR S0 Central action %f\n",llr_var.S0);
@@ -211,9 +211,9 @@ int main(int argc,char *argv[]) {
 
   lprintf("MAIN",0,"WF make %s\n",WF_var.make);
   lprintf("MAIN",0,"WF tmax: %e\n",WF_var.tmax);
-  lprintf("MAIN",0,"WF number of measures: %d\n",WF_var.nmeas);
-  lprintf("MAIN",0,"WF time lapse between measures: %e\n",WF_var.tmax/WF_var.nmeas);
-  lprintf("MAIN",0,"WF number of integration intervals per measure: %d\n",WF_var.nint);
+  lprintf("MAIN",0,"WF number of measurements: %d\n",WF_var.nmeas);
+  lprintf("MAIN",0,"WF time lapse between measurements: %e\n",WF_var.tmax/WF_var.nmeas);
+  lprintf("MAIN",0,"WF number of integration intervals per measurement: %d\n",WF_var.nint);
   lprintf("MAIN",0,"WF number of integration intervals: %d\n",WF_var.nint*WF_var.nmeas);
   lprintf("MAIN",0,"WF integration step: %e\n",WF_var.tmax/(WF_var.nmeas*WF_var.nint));
 
