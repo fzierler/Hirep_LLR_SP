@@ -206,16 +206,15 @@ void swap(double *data)
   {
     toswap[i] = 1;
     drep[i].repnext = drep[i + 1].rep;
-    double S1 = -drep[i + 1].a * drep[i].S_llr - drep[i].a * drep[i + 1].S_llr;
+    double S1 = drep[i + 1].a * drep[i].S_llr + drep[i].a * drep[i + 1].S_llr;
     double tmp1 = (drep[i].S_llr - drep[i + 1].S0) / drep[i + 1].dS;
     double tmp2 = (drep[i + 1].S_llr - drep[i].S0) / drep[i].dS;
     double S2 = (tmp1 * tmp1 + tmp2 * tmp2) / 2.;
-    double S3 = -drep[i + 1].a * drep[i + 1].S_llr - drep[i].a * drep[i].S_llr;
+    double S3 = drep[i + 1].a * drep[i + 1].S_llr + drep[i].a * drep[i].S_llr;
     tmp1 = (drep[i].S_llr - drep[i].S0) / drep[i].dS;
     tmp2 = (drep[i + 1].S_llr - drep[i + 1].S0) / drep[i + 1].dS;
     double S4 = (tmp1 * tmp1 + tmp2 * tmp2) / 2.;
-  //  drep[i].deltaS = S1 + S2 - S3 - S4;
-   drep[i].deltaS = - S1 + S2 + S3 - S4;  //djl
+    drep[i].deltaS = S1 + S2 - S3 - S4;  //djl
   }
 
   qsort(drep, N_REP - 1, sizeof(drep[0]), compare_deltaS);
@@ -258,8 +257,8 @@ void setreplica(double *data)
 {
 //  lprintf("llr:setreplica", 0, "Updating OLD LLR Param: S0 %lf,  a  %lf , dS %lf  \n", llrp.S0, llrp.a, llrp.dS);
   llrp.S0 = data[1];
-  llrp.dS = data[3];
   llrp.a = data[2];
+  llrp.dS = data[3];
   llrp.starta = data[4];
 
 //  lprintf("llr:setreplica", 0, "New LLR Param: S0 %lf,  a  %lf , dS %lf  \n", llrp.S0, llrp.a, llrp.dS);
