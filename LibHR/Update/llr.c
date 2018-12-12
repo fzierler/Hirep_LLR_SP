@@ -130,7 +130,7 @@ void robbinsmonro(void)
   S_llr_avr /= (double)llrp.nrm;
   S_non_llr_avr /= (double)llrp.nrm;
   llrp.a += (S_llr_avr - llrp.S0) / (llrp.dS * llrp.dS * llrp.it);
-  lprintf("ROBBINSMONRO", 0, "RM Step: %d GMC Iter: %d S_llr=%lf S_non_llr=%lf  a_llr=%lf \n", llrp.it, rmstep, S_llr_avr, S_non_llr_avr, llrp.a);
+  lprintf("ROBBINSMONRO", 0, "RM Iteration: %d S_llr= %lf S_non_llr= %lf  a_llr= %lf \n", llrp.it, S_llr_avr, S_non_llr_avr, llrp.a);
   llrp.it++;
 }
 
