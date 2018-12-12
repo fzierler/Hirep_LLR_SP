@@ -418,7 +418,7 @@ void calc_one_force(int n_force)
 int update_llr_ghmc(double *ret_S_llr, double *ret_S_non_llr, int therm)
 {
 
-  lprintf("LLR_HMC", 0, " Starting update...\n");
+  lprintf("LLR_HMC", 0, "Starting update...\n");
   double deltaH;
 
   if (!init)
