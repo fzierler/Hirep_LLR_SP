@@ -223,6 +223,7 @@ int main(int argc,char *argv[]) {
 
   lprintf("MAIN",0,"MVM during HMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial Plaquette: %1.8e\n",avr_plaquette());
+  lprintf("MAIN",0,"Start Initial Thermalization ------------------------------------------\n");
 
 
   for (i=1;i<=flow.therm;++i){
@@ -235,11 +236,14 @@ int main(int argc,char *argv[]) {
     lprintf("MAIN",0,"Initial Thermalization Plaquette: %1.8e\n",avr_plaquette());
     lprintf("MAIN",0,"Initial Thermalization step #%d/%d: generated in [%ld sec %ld usec]\n",i,flow.therm,etime.tv_sec,etime.tv_usec);    
   }
+  lprintf("MAIN",0,"End Initial Thermalization ------------------------------------------\n");
 
   int rmtherm = flow.therm/10;
   
   for(j=0;j<flow.rmrestart;++j) {
     
+    lprintf("MAIN",0,"Start RM%d Thermalization ------------------------------------------\n",j);
+    lprintf("MAIN",0,"-------------------------------------------------------------------\n");
     restart_robbinsmonro(llr_var.it);  
     
     for (i=1;i<=rmtherm;++i){
@@ -267,10 +271,11 @@ int main(int argc,char *argv[]) {
 #endif
       
     }
+    lprintf("MAIN",0,"End RM%d Thermalization ------------------------------------------\n",j);
     
-    
-    lprintf("MAIN",0,"RM%d Thermalization done.\n",j);
-
+   
+    lprintf("MAIN",0,"Start RM%d Phase ------------------------------------------\n",j);
+   
     lprintf("MAIN",0,"<a_rho(%d,%d,%lf)>= %f\n",j,flow.start-1,getS0(),llr_var.starta);
 
     for(i=flow.start;i<flow.end;++i) {
@@ -301,9 +306,9 @@ int main(int argc,char *argv[]) {
  
     }
     
-    
-    
-    lprintf("MAIN",0,"RM%d done. Final S0= %lf a_llr= %f\n",j,getS0(),get_llr_a());
+    lprintf("MAIN",0,"RM%d Final S0= %lf a_llr= %f\n",j,getS0(),get_llr_a());
+    lprintf("MAIN",0,"End RM%d Phase ------------------------------------------\n",j);
+    lprintf("MAIN",0,"Start RM%d Measurement Phase ------------------------------------------\n",j);
     
     for(i=0;i<flow.obsnmeas;++i) {
       struct timeval start, end, etime; /* //for trajectory timing */
@@ -331,8 +336,8 @@ int main(int argc,char *argv[]) {
       lprintf("MAIN",0,"RM%d Measurement %d for fixed S0= %f dS= %f a_llr= %f\n",j,i,getS0(),getdS(),get_llr_a());
       
       if((i%flow.meas_freq)==0) {                                                               
-	/* plaquette */                                                                                                                                 
-   	lprintf("MAIN",0,"RM%d Measurement %d Plaquette: %1.8e\n",j,i,avr_plaquette());
+	    /* plaquette */                                                                                                                                 
+   	    lprintf("MAIN",0,"RM%d Measurement %d Plaquette: %1.8e\n",j,i,avr_plaquette());
         
         if(strcmp(WF_var.make,"true")==0) {
           double E, Esym, TC;
@@ -380,10 +385,8 @@ int main(int argc,char *argv[]) {
         timeval_subtract(&etime,&end,&start);
         lprintf("MAIN",0,"RM%d Measurements on trajectory %d performed in [%ld sec %ld usec]\n",j,i,etime.tv_sec,etime.tv_usec);
       }
-
-
     }
-    
+    lprintf("MAIN",0,"End RM%d Measurement Phase ------------------------------------------\n",j);
   }
   
   /* save final configuration */
