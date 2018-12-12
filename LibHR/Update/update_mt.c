@@ -418,13 +418,13 @@ void calc_one_force(int n_force)
 int update_llr_ghmc(double *ret_S_llr, double *ret_S_non_llr, int therm)
 {
 
-  lprintf("LLR HMC", 0, " Starting update...\n");
+  lprintf("LLR_HMC", 0, " Starting update...\n");
   double deltaH;
 
   if (!init)
   {
     /* not initialized */
-    lprintf("LLR HMC", 0, "WARNING: GHMC not initialized!\nWARNNG: Ignoring call to update_llr_ghmc.\n");
+    lprintf("LLR_HMC", 0, "WARNING: GHMC not initialized!\nWARNNG: Ignoring call to update_llr_ghmc.\n");
     return -1;
   }
 
@@ -436,7 +436,7 @@ int update_llr_ghmc(double *ret_S_llr, double *ret_S_non_llr, int therm)
   }
 
   /* generate new momenta */
-  lprintf("LLR HMC", 30, "Generating gaussian momenta and pseudofermions...\n");
+  lprintf("LLR_HMC", 30, "Generating gaussian momenta and pseudofermions...\n");
   gaussian_momenta(momenta);
 
   /* generate new pseudofermions */
@@ -447,7 +447,7 @@ int update_llr_ghmc(double *ret_S_llr, double *ret_S_non_llr, int therm)
   }
 
   /* compute starting action */
-  lprintf("LLR HMC", 30, "Computing initial action density...\n");
+  lprintf("LLR_HMC", 30, "Computing initial action density...\n");
   local_llr_hmc_action(mon_act->Sold, mon_act->Sold_llr, mon_act->momold, la, la_llr, momenta);
   global_sum(mon_act->Hold, 3);
 
@@ -459,7 +459,7 @@ int update_llr_ghmc(double *ret_S_llr, double *ret_S_non_llr, int therm)
   }
 
   /* integrate molecular dynamics */
-  lprintf("LLR HMC", 10, "MD integration...\n");
+  lprintf("LLR_HMC", 10, "MD integration...\n");
   //#ifdef ADAPTIVE
   //  lprintf("LLR HMC", 10, "Adaptive stepsize definition enabled \n");
   //  adapt(therm);
@@ -470,7 +470,7 @@ int update_llr_ghmc(double *ret_S_llr, double *ret_S_non_llr, int therm)
   represent_gauge_field();
 
   /* compute new action */
-  lprintf("LLR HMC", 30, "Computing new action density...\n");
+  lprintf("LLR_HMC", 30, "Computing new action density...\n");
   for (int i = 0; i < num_mon(); ++i)
   {
     const monomial *m = mon_n(i);
@@ -488,11 +488,11 @@ int update_llr_ghmc(double *ret_S_llr, double *ret_S_non_llr, int therm)
   //  adp.deltaSold = adp.deltaS;
   //  adp.deltaS = deltaH;
   //#endif
-  lprintf("LLR HMC", 10, "[Snew non llr = %1.8e ][Sold non llr = %1.8e ][Snew llr = %1.8e ][Sold llr = %1.8e ]\n", *(mon_act->Snew), *(mon_act->Sold), *(mon_act->Snew_llr), *(mon_act->Sold_llr));
-  lprintf("LLR HMC", 10, "[momnew = %1.8e ][momold = %1.8e ]\n", *(mon_act->momnew), *(mon_act->momold));
-  lprintf("LLR HMC", 10, "[DeltaS = %1.8e ][exp(-DS) = %1.8e ]\n", deltaH, exp(-deltaH));
+  lprintf("LLR_HMC", 10, "[Snew non llr = %1.8e ][Sold non llr = %1.8e ][Snew llr = %1.8e ][Sold llr = %1.8e ]\n", *(mon_act->Snew), *(mon_act->Sold), *(mon_act->Snew_llr), *(mon_act->Sold_llr));
+  lprintf("LLR_HMC", 10, "[momnew = %1.8e ][momold = %1.8e ]\n", *(mon_act->momnew), *(mon_act->momold));
+  lprintf("LLR_HMC", 10, "[DeltaS = %1.8e ][exp(-DS) = %1.8e ]\n", deltaH, exp(-deltaH));
   if (therm)
-    lprintf("LLR HMC", 10, "Skipping Metropolis test\n");
+    lprintf("LLR_HMC", 10, "Skipping Metropolis test\n");
   if (deltaH < 0 || therm)
   {
     suNg_field_copy(u_gauge_old, u_gauge);
@@ -521,7 +521,7 @@ int update_llr_ghmc(double *ret_S_llr, double *ret_S_non_llr, int therm)
     }
     else
     {
-      lprintf("LLR HMC", 0, "Configuration rejected.\n");
+      lprintf("LLR_HMC", 0, "Configuration rejected.\n");
       suNg_field_copy(u_gauge, u_gauge_old);
       start_gf_sendrecv(u_gauge); /* this may not be needed if we always guarantee that we copy also the buffers */
       represent_gauge_field();
@@ -531,7 +531,7 @@ int update_llr_ghmc(double *ret_S_llr, double *ret_S_non_llr, int therm)
     }
   }
 
-  lprintf("LLR HMC", 10, "Configuration accepted.\n");
+  lprintf("LLR_HMC", 10, "Configuration accepted.\n");
 
   *ret_S_llr = *(mon_act->Snew_llr);
   *ret_S_non_llr = *(mon_act->Snew);
