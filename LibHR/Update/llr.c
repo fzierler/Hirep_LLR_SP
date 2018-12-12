@@ -189,11 +189,11 @@ void swap(double *data)
   for (i = 0; i < N_REP; i++)
   {
 
-    drep[i].S_llr = data[4 * i];
-    drep[i].S0 = data[4 * i + 1];
-    drep[i].a = data[4 * i + 2];
-    drep[i].dS = data[4 * i + 3];
-    drep[i].starta = data[4 * i + 4];
+    drep[i].S_llr = data[5 * i];
+    drep[i].S0 = data[5 * i + 1];
+    drep[i].a = data[5 * i + 2];
+    drep[i].dS = data[5 * i + 3];
+    drep[i].starta = data[5 * i + 4];
     drep[i].rep = i;
   }
 
@@ -231,9 +231,9 @@ void swap(double *data)
       {
         for (j = 0; j < 5; j++)
         {
-          temp = data[4 * drep[i].rep + j];
-          data[4 * drep[i].rep + j] = data[4 * drep[i].repnext + j];
-          data[4 * drep[i].repnext + j] = temp;
+          temp = data[5 * drep[i].rep + j];
+          data[5 * drep[i].rep + j] = data[5 * drep[i].repnext + j];
+          data[5 * drep[i].repnext + j] = temp;
         }
       }
       else
@@ -243,9 +243,9 @@ void swap(double *data)
         {
           for (j = 0; j < 5; j++)
           {
-            temp = data[4 * drep[i].rep + j];
-            data[4 * drep[i].rep + j] = data[4 * drep[i].repnext + j];
-            data[4 * drep[i].repnext + j] = temp;
+            temp = data[5 * drep[i].rep + j];
+            data[5 * drep[i].rep + j] = data[5 * drep[i].repnext + j];
+            data[5 * drep[i].repnext + j] = temp;
           }
         }
       }
