@@ -242,19 +242,19 @@ int main(int argc,char *argv[]) {
   
   for(j=0;j<flow.rmrestart;++j) {
     
-    lprintf("MAIN",0,"Start RM%d Thermalization ------------------------------------------\n",j);
+    lprintf("MAIN",0,"Start RM%d Inter Restart Thermalization ------------------------------------------\n",j);
     lprintf("MAIN",0,"-------------------------------------------------------------------\n");
     restart_robbinsmonro(llr_var.it);  
     
     for (i=1;i<=rmtherm;++i){
       struct timeval start, end, etime; /* //for trajectory timing */
-      lprintf("MAIN",0,"RM%d Thermalization step #%d/%d\n",j,i,rmtherm);
+      lprintf("MAIN",0,"RM%d Inter Restart Thermalization step #%d/%d\n",j,i,rmtherm);
       gettimeofday(&start,0);
       thermrobbinsmonro();
       gettimeofday(&end,0);
       timeval_subtract(&etime,&end,&start);
-      lprintf("MAIN",0,"RM%d Thermalization Plaquette: %lf\n",j,avr_plaquette());
-      lprintf("MAIN",0,"RM%d Thermalization step #%d/%d: generated in [%ld sec %ld usec]\n",j,i,rmtherm,etime.tv_sec,etime.tv_usec);    
+      lprintf("MAIN",0,"RM%d Inter Restart Thermalization Plaquette: %lf\n",j,avr_plaquette());
+      lprintf("MAIN",0,"RM%d Inter Restart Thermalization step #%d/%d: generated in [%ld sec %ld usec]\n",j,i,rmtherm,etime.tv_sec,etime.tv_usec);    
       
       
 #ifdef MEASURE_FORCELLR
@@ -271,12 +271,12 @@ int main(int argc,char *argv[]) {
 #endif
       
     }
-    lprintf("MAIN",0,"End RM%d Thermalization ------------------------------------------\n",j);
+    lprintf("MAIN",0,"End RM%d Inter Restart Thermalization ------------------------------------------\n",j);
     
    
     lprintf("MAIN",0,"Start RM%d Phase ------------------------------------------\n",j);
    
-    lprintf("MAIN",0,"<a_rho(%d,%d,%lf)>= %f\n",j,flow.start-1,getS0(),llr_var.starta);
+    lprintf("MAIN",0,"<a_rho(%d,%d,%lf)>= %f\n",j,flow.start-1,getS0(),get_llr_a()); // restart will have set a to starta
 
     for(i=flow.start;i<flow.end;++i) {
       struct timeval start, end, etime; /* //for trajectory timing */
