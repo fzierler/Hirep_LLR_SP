@@ -386,16 +386,18 @@ int main(int argc,char *argv[]) {
         lprintf("MAIN",0,"RM%d Measurements on trajectory %d performed in [%ld sec %ld usec]\n",j,i,etime.tv_sec,etime.tv_usec);
       }
     }
+
+    /* save final configuration */
+    save_conf(&flow, (flow.obsnmeas + flow.end-flow.start)*flow.rmrestart);
+          /* Only save state if we have a file to save to */
+    if(rlx_var.rlxd_state[0]!='\0') {
+      lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
+     write_ranlxd_state(rlx_var.rlxd_state);
+    }
+
     lprintf("MAIN",0,"End RM%d Measurement Phase ------------------------------------------\n",j);
   }
   
-  /* save final configuration */
-  save_conf(&flow, (flow.obsnmeas + flow.end-flow.start)*flow.rmrestart);
-  /* Only save state if we have a file to save to */
-  if(rlx_var.rlxd_state[0]!='\0') {
-    lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
-    write_ranlxd_state(rlx_var.rlxd_state);
-  }
   gettimeofday(&endmain,0);
   timeval_subtract(&etimemain,&endmain,&startmain);
   
