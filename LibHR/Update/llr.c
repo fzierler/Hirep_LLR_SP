@@ -105,7 +105,7 @@ void robbinsmonro(void)
 
   for (rmstep = 1; rmstep <= llrp.nth; rmstep++)
   {
-    lprintf("ROBBINSMONRO", 30, "Thermalization: %d\n", rmstep);
+    lprintf("ROBBINSMONRO", 30, "Inter Sequence Thermalization: %d\n", rmstep);
     update_llr_ghmc(&S_llr, &S_non_llr, 0);
 #ifdef WITH_UMBRELLA
     if (rmstep % (llrp.umb_freq) == 1)
