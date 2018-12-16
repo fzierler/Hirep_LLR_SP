@@ -320,7 +320,7 @@ int main(int argc,char *argv[]) {
       llr_fixed_a_update();
 
       if((i%flow.save_freq)==0) {
-        save_conf(&flow, i);
+        save_conf(&flow, flow.obsnmeas*j + i);
         /* Only save state if we have a file to save to */
         if(rlx_var.rlxd_state[0]!='\0') {
           lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
@@ -388,7 +388,7 @@ int main(int argc,char *argv[]) {
     }
 
     /* save final configuration */
-    save_conf(&flow, (flow.obsnmeas + flow.end-flow.start)*flow.rmrestart);
+    save_conf(&flow, flow.obsnmeas*(j+1);
           /* Only save state if we have a file to save to */
     if(rlx_var.rlxd_state[0]!='\0') {
       lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
