@@ -53,14 +53,14 @@ static int nf(){
   return 0;
 }
 
-static void mk_gconf_name(char *name, hmc_flow *rf, int id) {
+static void mk_gconf_name(char *name, hmc_flow *rf, int rm, int id) {
   /* build configuration name */
   if (strlen(rf->run_name)>10)
-      sprintf(name,"%sn%d",rf->run_name,id);
+      sprintf(name,"%srm%dn%d",rf->run_name,rm,id);
   else{
-    sprintf(name,"%s_%dx%dx%dx%dnc%dr%snf%db%.6fm%.6fn%d",
+    sprintf(name,"%s_%dx%dx%dx%dnc%dr%snf%db%.6fm%.6frm%dn%d",
             rf->run_name,GLB_T,GLB_X,GLB_Y,GLB_Z,NG,repr_name,
-            nf(),beta(),-mass(),id);
+            nf(),beta(),-mass(),rm,id);
   }
 }
 
@@ -266,10 +266,10 @@ int init_mc(hmc_flow *rf, char *ifile) {
 }
     
 /* save the gauge config with the specified id */
-int save_conf(hmc_flow *rf, int id) {
+int save_conf(hmc_flow *rf, int rm, int id) {
   char buf[256];
   
-  mk_gconf_name(buf, rf, id);
+  mk_gconf_name(buf, rf, rm, id);
   write_gauge_field(add_dirname(rf->conf_dir,buf));
   
   return 0;
