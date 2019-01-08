@@ -241,7 +241,6 @@ int main(int argc,char *argv[]) {
   }
   lprintf("MAIN",0,"End Initial Thermalization ------------------------------------------\n");
 
-  int rmtherm = flow.therm/10;
   
   for(j=flow.rmrestart;j<flow.rmrestart;++j) {
     
