@@ -185,7 +185,10 @@ int init_mc(hmc_flow *rf, char *ifile) {
   strcpy(rf->conf_dir,"./");
   rf->save_freq=0;
   rf->meas_freq=0;
+  rf->interrm_therm=0;
   rf->therm=0;
+  rf->obsmeas_start=0;
+  rf->rmstart=0;
   rf->hmc_v=&hmc_var;
 
   read_input(hmc_var.read,ifile);
