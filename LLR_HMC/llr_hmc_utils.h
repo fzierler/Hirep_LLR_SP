@@ -43,6 +43,8 @@ typedef struct _hmc_flow {
   char conf_dir[64]; /* directory to store gconfs */
   
   int therm;
+  int interrm_therm; /* djl: a separate thermalisation parameter between rm restarts */
+  int rmstart;  /* djl: to allow restarts after machine failures */
   int rmrestart;
   int save_freq; /* save gauge conf if number%save_freq==0 */
   int meas_freq; /* mk measures if number%meas_freq==0 */
@@ -51,13 +53,14 @@ typedef struct _hmc_flow {
    * but inferred from the above
    */
   int start, end;
+  int obsmeas_start; /* djl: to allow restarts after machine failures */
   int obsnmeas;
   int umb_freq;
   
   input_hmc *hmc_v;
 
   /* for the reading function */
-  input_record_t read[11];
+  input_record_t read[14];
   
 } hmc_flow;
 
@@ -71,7 +74,10 @@ typedef struct _hmc_flow {
     {"config dir", "config dir = %s", STRING_T, &((varname).conf_dir[0])},\
     {"conf save frequency", "save freq = %d", INT_T, &((varname).save_freq)},\
     {"therm", "therm = %d", INT_T, &((varname).therm)},			\
+    {"inter rm therm", "inter rm therm = %d", INT_T, &((varname).interrm_therm)},			\
+    {"rm start", "rm start = %d", INT_T, &((varname).rmstart)},			\
     {"rm restart", "rm restart = %d", INT_T, &((varname).rmrestart)},			\
+    {"Obs meas start", "Obs meas start = %d", INT_T, &((varname).obsmeas_start)},			\
     {"Obs n meas", "Obs n meas = %d", INT_T, &((varname).obsnmeas)},			\
     {"meas freq", "meas freq = %d", INT_T, &((varname).meas_freq)},	\
     {NULL, NULL, 0, NULL}\

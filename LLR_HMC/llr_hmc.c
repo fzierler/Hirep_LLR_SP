@@ -191,10 +191,13 @@ int main(int argc,char *argv[]) {
 
   init_mc(&flow, input_filename);
   
-  lprintf("MAIN",0,"Thermalization steps: %d\n",flow.therm);
+  lprintf("MAIN",0,"Initial Thermalization steps: %d\n",flow.therm);
+  lprintf("MAIN",0,"Inter RM Thermalization steps: %d\n",flow.interrm_therm);
   lprintf("MAIN",0,"RM steps: %d\n",flow.end-flow.start);
+  lprintf("MAIN",0,"RM start value: %d\n",flow.rmstart);
   lprintf("MAIN",0,"RM global restart: %d\n",flow.rmrestart);
-  lprintf("MAIN",0,"Observable measures after RM: %d\n",flow.obsnmeas);
+  lprintf("MAIN",0,"Observable measurements start value: %d\n",flow.obsmeas_start);
+  lprintf("MAIN",0,"Observable measurements after RM: %d\n",flow.obsnmeas);
   
   /* read input for llr update */
   read_input(llr_var.read,input_filename);
@@ -240,21 +243,21 @@ int main(int argc,char *argv[]) {
 
   int rmtherm = flow.therm/10;
   
-  for(j=0;j<flow.rmrestart;++j) {
+  for(j=flow.rmrestart;j<flow.rmrestart;++j) {
     
     lprintf("MAIN",0,"Start RM%d Thermalization ------------------------------------------\n",j);
     lprintf("MAIN",0,"-------------------------------------------------------------------\n");
     restart_robbinsmonro(llr_var.it);  
     
-    for (i=1;i<=rmtherm;++i){
+    for (i=1;i<=flow.interrm_therm;++i){
       struct timeval start, end, etime; /* //for trajectory timing */
-      lprintf("MAIN",0,"RM%d Thermalization step #%d/%d\n",j,i,rmtherm);
+      lprintf("MAIN",0,"RM%d Inter Restart Thermalization step #%d/%d\n",j,i,flow.interrm_therm);
       gettimeofday(&start,0);
       thermrobbinsmonro();
       gettimeofday(&end,0);
       timeval_subtract(&etime,&end,&start);
-      lprintf("MAIN",0,"RM%d Thermalization Plaquette: %1.8e\n",j,avr_plaquette());
-      lprintf("MAIN",0,"RM%d Thermalization step #%d/%d: generated in [%ld sec %ld usec]\n",j,i,rmtherm,etime.tv_sec,etime.tv_usec);    
+      lprintf("MAIN",0,"RM%d Inter Restart Thermalization Plaquette: %lf\n",j,avr_plaquette());
+      lprintf("MAIN",0,"RM%d Inter Restart Thermalization step #%d/%d: generated in [%ld sec %ld usec]\n",j,i,flow.interrm_therm,etime.tv_sec,etime.tv_usec);    
       
       
 #ifdef MEASURE_FORCELLR
@@ -310,7 +313,7 @@ int main(int argc,char *argv[]) {
     lprintf("MAIN",0,"End RM%d Phase ------------------------------------------\n",j);
     lprintf("MAIN",0,"Start RM%d Measurement Phase ------------------------------------------\n",j);
     
-    for(i=0;i<flow.obsnmeas;++i) {
+    for(i=flow.obsmeas_start;i<flow.obsnmeas;++i) {
       struct timeval start, end, etime; /* //for trajectory timing */
 
       lprintf("MAIN",0,"RM%d Trajectory #%d of %d\n",j,i,flow.obsnmeas);
@@ -387,13 +390,6 @@ int main(int argc,char *argv[]) {
       }
     }
 
-    /* save final configuration */
-    save_conf(&flow, flow.obsnmeas*(j+1);
-          /* Only save state if we have a file to save to */
-    if(rlx_var.rlxd_state[0]!='\0') {
-      lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
-     write_ranlxd_state(rlx_var.rlxd_state);
-    }
 
     lprintf("MAIN",0,"End RM%d Measurement Phase ------------------------------------------\n",j);
   }
