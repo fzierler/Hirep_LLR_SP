@@ -242,7 +242,7 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"End Initial Thermalization ------------------------------------------\n");
 
   
-  for(j=flow.rmrestart;j<flow.rmrestart;++j) {
+  for(j=flow.rmstart;j<flow.rmrestart;++j) {
     
     lprintf("MAIN",0,"Start RM%d Inter Restart Thermalization ------------------------------------------\n",j);
     lprintf("MAIN",0,"-------------------------------------------------------------------\n");
