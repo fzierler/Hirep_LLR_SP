@@ -222,7 +222,7 @@ int main(int argc,char *argv[]) {
 
 
   WF_initialize();
-  init_robbinsmonro(llr_var.nmc,llr_var.nth,llr_var.starta,llr_var.it,flow.umb_freq,llr_var.dS,llr_var.S0);
+  init_robbinsmonro(llr_var.nmc,llr_var.nth,llr_var.starta,llr_var.it,flow.umb_RM_freq,lflow.umb_meas_freq,flow.umb_therm_freq,lr_var.dS,llr_var.S0);
 
   lprintf("MAIN",0,"MVM during HMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial Plaquette: %1.8e\n",avr_plaquette());

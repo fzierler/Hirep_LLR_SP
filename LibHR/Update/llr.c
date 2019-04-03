@@ -23,7 +23,8 @@
 
 typedef struct
 {
-  int nrm, nth, umb_freq;
+  int nrm, nth;
+  int umb_RM_freq, umb_meas_freq, umb_therm_freq;
   int it;
   double starta;
   double a;
@@ -40,12 +41,14 @@ void restart_robbinsmonro(int startit)
   llrp.a = llrp.starta;
 }
 
-void init_robbinsmonro(int nrm, int nth, double starta, int it, int swap, double dS, double S0)
+void init_robbinsmonro(int nrm, int nth, double starta, int it, int RMswap, int measswap, int thermswap, double dS, double S0)
 {
   llrp.nrm = nrm;
   llrp.nth = nth;
   llrp.it = it;
-  llrp.umb_freq = swap;
+  llrp.umb_RM_freq = RMswap;
+  llrp.umb_meas_freq = measswap;
+  llrp.umb_therm_freq = thermswap;
   llrp.starta = starta;
   llrp.a = starta;
   llrp.dS = dS;
@@ -77,7 +80,7 @@ void thermrobbinsmonro(void)
   double S_llr, S_non_llr;
   update_llr_ghmc(&S_llr, &S_non_llr, no_metropolit_test);
 #ifdef WITH_UMBRELLA
-  if (step % (llrp.umb_freq) == 0)
+  if (step % (llrp.umb_therm_freq) == 0)
     umbrella_swap(&S_llr, &llrp.S0, &llrp.a, &llrp.dS, &llrp.starta);
 #endif
   step++;
@@ -91,7 +94,7 @@ void llr_fixed_a_update(void)
   update_llr_ghmc(&S_llr, &S_non_llr, 0);
 
 #ifdef WITH_UMBRELLA
-  if (step % (llrp.umb_freq) == 0)
+  if (step % (llrp.umb_meas_freq) == 0)
     umbrella_swap(&S_llr, &llrp.S0, &llrp.a, &llrp.dS, &llrp.starta);
 #endif
   step++;
@@ -109,7 +112,7 @@ void robbinsmonro(void)
     lprintf("ROBBINSMONRO", 30, "Inter Sequence Thermalization: %d\n", rmstep);
     update_llr_ghmc(&S_llr, &S_non_llr, 0);
 #ifdef WITH_UMBRELLA
-    if (rmstep % (llrp.umb_freq) == 1)
+    if (rmstep % (llrp.umb_therm_freq) == 1)
       umbrella_swap(&S_llr, &llrp.S0, &llrp.a, &llrp.dS, &llrp.starta);
 #endif
   }
@@ -122,7 +125,7 @@ void robbinsmonro(void)
     S_llr_avr += S_llr;
     S_non_llr_avr += S_non_llr;
 #ifdef WITH_UMBRELLA
-    if (rmstep % (llrp.umb_freq) == 0)
+    if (rmstep % (llrp.umb_RM_freq) == 0)
       umbrella_swap(&S_llr, &llrp.S0, &llrp.a, &llrp.dS, &llrp.starta);
 #endif
   }
