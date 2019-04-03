@@ -54,6 +54,7 @@ typedef struct _input_llr {
       {"Number of MC therm steps per RM iteration", "llr:nth = %d", INT_T, &((varname).nth)}, \
       {"Initial a", "llr:starta = %lf", DOUBLE_T, &((varname).starta)}, \
       {"Robbins Monro startint iteration", "llr:it = %d", INT_T, &((varname).it)}, \
+      {"Cfactor in RM a_llr updates", "llr:cfactor = %lf", DOUBLE_T, &((varname).cfactor)}, \
       {"Cental action", "llr:S0 = %lf", DOUBLE_T, &((varname).S0)},     \
       {"Delta S", "llr:dS = %lf", DOUBLE_T, &((varname).dS)},           \
       {NULL, NULL, 0, NULL}                                             \
