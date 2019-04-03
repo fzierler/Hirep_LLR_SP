@@ -303,7 +303,7 @@ void thermrobbinsmonro(void);
 void measrobbinsmonro(void);
 void robbinsmonro(void);
 void restart_robbinsmonro(int it);
-void init_robbinsmonro(int nrm,int nth,double starta,int it,int swap,double dS,double S0);
+void init_robbinsmonro(int nrm,int nth,double starta,int it,double cfactor,int RMswap,int measswap,int thermswap,double dS,double S0);
 double getdS(void);
 double get_llr_a(void);
 double getS0(void);

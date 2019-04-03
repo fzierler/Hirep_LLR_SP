@@ -25,6 +25,7 @@ typedef struct
 {
   int nrm, nth;
   int umb_RM_freq, umb_meas_freq, umb_therm_freq;
+  int cfactor;
   int it;
   double starta;
   double a;
@@ -41,11 +42,12 @@ void restart_robbinsmonro(int startit)
   llrp.a = llrp.starta;
 }
 
-void init_robbinsmonro(int nrm, int nth, double starta, int it, int RMswap, int measswap, int thermswap, double dS, double S0)
+void init_robbinsmonro(int nrm, int nth, double starta, int it, double cfactor, int RMswap, int measswap, int thermswap, double dS, double S0)
 {
   llrp.nrm = nrm;
   llrp.nth = nth;
   llrp.it = it;
+  llrp.cfactor = cfactor;
   llrp.umb_RM_freq = RMswap;
   llrp.umb_meas_freq = measswap;
   llrp.umb_therm_freq = thermswap;
@@ -132,7 +134,7 @@ void robbinsmonro(void)
 
   S_llr_avr /= (double)llrp.nrm;
   S_non_llr_avr /= (double)llrp.nrm;
-  llrp.a += (S_llr_avr - llrp.S0) / (llrp.dS * llrp.dS * llrp.it);
+  llrp.a += (S_llr_avr - llrp.S0) * llrp.cfactor / (llrp.dS * llrp.dS * llrp.it);
   lprintf("ROBBINSMONRO", 0, "RM Iteration: %d S_llr= %lf S_non_llr= %lf  a_llr= %lf \n", llrp.it, S_llr_avr, S_non_llr_avr, llrp.a);
   llrp.it++;
 }
