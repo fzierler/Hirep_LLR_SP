@@ -38,9 +38,10 @@
 typedef struct _input_llr {
   char make[256];
   int nmc,nth,it;
+  double cfactor;
   double starta,S0,dS;
   /* for the reading function */
-  input_record_t read[8];
+  input_record_t read[9];
 } input_llr;
 
 
@@ -223,7 +224,7 @@ int main(int argc,char *argv[]) {
 
 
   WF_initialize();
-  init_robbinsmonro(llr_var.nmc,llr_var.nth,llr_var.starta,llr_var.it,flow.umb_RM_freq,lflow.umb_meas_freq,flow.umb_therm_freq,lr_var.dS,llr_var.S0);
+  init_robbinsmonro(llr_var.nmc,llr_var.nth,llr_var.starta,llr_var.it,llr_var.cfactor,flow.umb_RM_freq,flow.umb_meas_freq,flow.umb_therm_freq,llr_var.dS,llr_var.S0);
 
   lprintf("MAIN",0,"MVM during HMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial Plaquette: %1.8e\n",avr_plaquette());
