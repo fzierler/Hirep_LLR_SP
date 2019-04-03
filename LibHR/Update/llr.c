@@ -113,7 +113,7 @@ void robbinsmonro(void)
     lprintf("ROBBINSMONRO", 30, "Inter Sequence Thermalization: %d\n", rmstep);
     update_llr_ghmc(&S_llr, &S_non_llr, 0);
 #ifdef WITH_UMBRELLA
-    if (rmstep % (llrp.umb_therm_freq) == 1)
+    if (rmstep % (llrp.umb_therm_freq) == 0)
       umbrella_swap(&S_llr, &llrp.S0, &llrp.a, &llrp.dS, &llrp.starta);
 #endif
   }
