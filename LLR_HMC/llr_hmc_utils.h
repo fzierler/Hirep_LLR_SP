@@ -62,7 +62,7 @@ typedef struct _hmc_flow {
   input_hmc *hmc_v;
 
   /* for the reading function */
-  input_record_t read[14];
+  input_record_t read[16];
   
 } hmc_flow;
 
