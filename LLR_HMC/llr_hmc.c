@@ -206,7 +206,7 @@ int main(int argc,char *argv[]) {
 
   lprintf("MAIN",0,"LLR number of mc steps per RM: %d\n",llr_var.nmc);
   lprintf("MAIN",0,"LLR number of therm steps per RM %d\n",llr_var.nth);
-  lprintf("MAIN",0,"LLR Initial a %f\n",llr_var.starta);
+  lprintf("MAIN",0,"LLR Initial a %.9f\n",llr_var.starta);
   lprintf("MAIN",0,"LLR RM start value iteration %d\n",llr_var.it);
   lprintf("MAIN",0,"LLR S0 Central action %f\n",llr_var.S0);
   lprintf("MAIN",0,"LLR Delta S %f\n",llr_var.dS);
@@ -257,7 +257,7 @@ int main(int argc,char *argv[]) {
       thermrobbinsmonro();
       gettimeofday(&end,0);
       timeval_subtract(&etime,&end,&start);
-      lprintf("MAIN",0,"RM%d Inter Restart Thermalization Plaquette: %lf\n",j,avr_plaquette());
+      lprintf("MAIN",0,"RM%d Inter Restart Thermalization Plaquette: %.9f\n",j,avr_plaquette());
       lprintf("MAIN",0,"RM%d Inter Restart Thermalization step #%d/%d: generated in [%ld sec %ld usec]\n",j,i,flow.interrm_therm,etime.tv_sec,etime.tv_usec);    
       
       
@@ -280,7 +280,7 @@ int main(int argc,char *argv[]) {
    
     lprintf("MAIN",0,"Start RM%d Phase ------------------------------------------\n",j);
    
-    lprintf("MAIN",0,"<a_rho(%d,%d,%lf)>= %f\n",j,flow.start-1,getS0(),get_llr_a()); // restart will have set a to starta
+    lprintf("MAIN",0,"<a_rho(%d,%d,%f)>= %.9f\n",j,flow.start-1,getS0(),get_llr_a()); // restart will have set a to starta
 
     for(i=flow.start;i<flow.end;++i) {
       struct timeval start, end, etime; /* //for trajectory timing */
@@ -304,13 +304,13 @@ int main(int argc,char *argv[]) {
       robbinsmonro();
       gettimeofday(&end,0);
       timeval_subtract(&etime,&end,&start);
-      lprintf("MAIN",0,"RM%d sequence %d Plaquette: %lf \n",j,i,avr_plaquette());    
-      lprintf("MAIN",0,"<a_rho(%d,%d,%lf)>= %f\n",j,i,getS0(),get_llr_a());
+      lprintf("MAIN",0,"RM%d sequence %d Plaquette: %.9f \n",j,i,avr_plaquette());    
+      lprintf("MAIN",0,"<a_rho(%d,%d,%f)>= %.9f\n",j,i,getS0(),get_llr_a());
       lprintf("MAIN",0,"RM%d sequence #%d/%d: generated in [%ld sec %ld usec]\n",j,i,flow.end-flow.start,etime.tv_sec,etime.tv_usec);
  
     }
     
-    lprintf("MAIN",0,"RM%d Final S0= %lf a_llr= %f\n",j,getS0(),get_llr_a());
+    lprintf("MAIN",0,"RM%d Final S0= %lf a_llr= %.9f\n",j,getS0(),get_llr_a());
     lprintf("MAIN",0,"End RM%d Phase ------------------------------------------\n",j);
     lprintf("MAIN",0,"Start RM%d Measurement Phase ------------------------------------------\n",j);
     
@@ -327,7 +327,7 @@ int main(int argc,char *argv[]) {
       timeval_subtract(&etime,&end,&start);
       lprintf("MAIN",0,"RM%d Trajectory #%d: generated in [%ld sec %ld usec]\n",j,i,etime.tv_sec,etime.tv_usec);
       
-      lprintf("MAIN",0,"RM%d Measurement %d for fixed S0= %f dS= %f a_llr= %f\n",j,i,getS0(),getdS(),get_llr_a());
+      lprintf("MAIN",0,"RM%d Measurement %d for fixed S0= %f dS= %f a_llr= %.9f\n",j,i,getS0(),getdS(),get_llr_a());
       
       if((i%flow.meas_freq)==0) {                                                               
 	    /* plaquette */                                                                                                                                 
