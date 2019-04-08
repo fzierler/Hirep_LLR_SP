@@ -102,7 +102,7 @@ void llr_fixed_a_update(void)
   step++;
 }
 
-void robbinsmonro(void)
+void robbinsmonro(int rm)
 {
 
   int rmstep;
@@ -111,7 +111,7 @@ void robbinsmonro(void)
 
   for (rmstep = 1; rmstep <= llrp.nth; rmstep++)
   {
-    lprintf("ROBBINSMONRO", 30, "Inter Sequence Thermalization: %d\n", rmstep);
+    lprintf("ROBBINSMONRO", 30, "RM%d Inter Sequence Thermalization: %d\n", rm, rmstep);
     update_llr_ghmc(&S_llr, &S_non_llr, 0);
 #ifdef WITH_UMBRELLA
     if (rmstep % (llrp.umb_therm_freq) == 0)
@@ -135,7 +135,7 @@ void robbinsmonro(void)
   S_llr_avr /= (double)llrp.nrm;
   S_non_llr_avr /= (double)llrp.nrm;
   llrp.a += (S_llr_avr - llrp.S0) * llrp.cfactor / (llrp.dS * llrp.dS * llrp.it);
-  lprintf("ROBBINSMONRO", 0, "RM Iteration: %d S_llr= %lf S_non_llr= %lf  a_llr= %lf \n", llrp.it, S_llr_avr, S_non_llr_avr, llrp.a);
+  lprintf("ROBBINSMONRO", 0, "RM%d Iteration: %d SO= %lf dS= %lf S_llr= %lf S_non_llr= %lf  a_llr= %lf \n", rm, llrp.it, llrp.S0, llrp.dS, S_llr_avr, S_non_llr_avr, llrp.a);
   llrp.it++;
 }
 
