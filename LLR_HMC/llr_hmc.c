@@ -56,7 +56,7 @@ typedef struct _input_llr {
       {"Initial a", "llr:starta = %lf", DOUBLE_T, &((varname).starta)}, \
       {"Robbins Monro startint iteration", "llr:it = %d", INT_T, &((varname).it)}, \
       {"Cfactor in RM a_llr updates", "llr:cfactor = %lf", DOUBLE_T, &((varname).cfactor)}, \
-      {"Cental action", "llr:S0 = %lf", DOUBLE_T, &((varname).S0)},     \
+      {"Central action", "llr:S0 = %lf", DOUBLE_T, &((varname).S0)},     \
       {"Delta S", "llr:dS = %lf", DOUBLE_T, &((varname).dS)},           \
       {NULL, NULL, 0, NULL}                                             \
     }                                                                   \
@@ -201,6 +201,10 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"Observable measurements start value: %d\n",flow.obsmeas_start);
   lprintf("MAIN",0,"Observable measurements after RM: %d\n",flow.obsnmeas);
   
+  lprintf("MAIN",0,"Umbrella freq during thermalisation: %d\n",flow.umb_therm_freq);
+  lprintf("MAIN",0,"Umbrella freq during RM: %d\n",flow.umb_RM_freq);
+  lprintf("MAIN",0,"Umbrella freq during measurement: %d\n",flow.umb_meas_freq);
+
   /* read input for llr update */
   read_input(llr_var.read,input_filename);
 
@@ -208,6 +212,7 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"LLR nunber of therm steps per RM %d\n",llr_var.nth);
   lprintf("MAIN",0,"LLR Initial a %f\n",llr_var.starta);
   lprintf("MAIN",0,"LLR RM start value iteration %d\n",llr_var.it);
+  lprintf("MAIN",0,"LLR cfactor in RM a_llr updates %f\n",llr_var.cfactor);
   lprintf("MAIN",0,"LLR S0 Central action %f\n",llr_var.S0);
   lprintf("MAIN",0,"LLR Delta S %f\n",llr_var.dS);
  
@@ -301,7 +306,7 @@ int main(int argc,char *argv[]) {
       }
 #endif
       
-      robbinsmonro();
+      robbinsmonro(j);
       gettimeofday(&end,0);
       timeval_subtract(&etime,&end,&start);
       lprintf("MAIN",0,"RM%d sequence %d Plaquette: %lf \n",j,i,avr_plaquette());    
