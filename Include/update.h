@@ -301,7 +301,7 @@ void find_spec_H2(double *max, double *min);
 //void total_llr_action(double * S_llr);
 void thermrobbinsmonro(void);
 void measrobbinsmonro(void);
-void robbinsmonro(void);
+void robbinsmonro(int rm);
 void restart_robbinsmonro(int it);
 void init_robbinsmonro(int nrm,int nth,double starta,int it,double cfactor,int RMswap,int measswap,int thermswap,double dS,double S0);
 double getdS(void);
