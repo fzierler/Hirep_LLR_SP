@@ -101,6 +101,8 @@ hmc_flow flow=init_hmc_flow(flow);
 char input_filename[256] = "input_file";
 char output_filename[256] = "out_0";
 char error_filename[256] = "err_0";
+char stop_filename[256] = "stopfile";
+
 
 static void read_cmdline(int argc, char* argv[]) {
   int i, ai=0, ao=0, am=0, requested=1;
@@ -313,6 +315,14 @@ int main(int argc,char *argv[]) {
       lprintf("MAIN",0,"<a_rho(%d,%d,%lf)>= %f\n",j,i,getS0(),get_llr_a());
       lprintf("MAIN",0,"RM%d sequence #%d/%d: generated in [%ld sec %ld usec]\n",j,i,flow.end-flow.start,etime.tv_sec,etime.tv_usec);
  
+      // Graceful stop if one stopfile in Rep_0/
+      if(check_stopfile(stop_filename)) {
+        save_conf(&flow, j, i);    // omit ranlux save
+        lprintf("MAIN",0,"STOP simulation due to presence of file %s ------------------------------------------\n",stop_filename);
+        end_mc();
+        finalize_process();
+        return 0;
+      }
     }
     
     lprintf("MAIN",0,"RM%d Final S0= %lf a_llr= %f\n",j,getS0(),get_llr_a());
@@ -383,14 +393,22 @@ int main(int argc,char *argv[]) {
         gettimeofday(&end,0);
         timeval_subtract(&etime,&end,&start);
         lprintf("MAIN",0,"RM%d Measurements on trajectory %d performed in [%ld sec %ld usec]\n",j,i,etime.tv_sec,etime.tv_usec);
-  
+
+        // Graceful stop  if one stopfile in Rep_0/
+        if(check_stopfile(stop_filename)) {
+          save_conf(&flow, j, i);   // omit ranlux save
+          lprintf("MAIN",0,"STOP simulation due to presence of file %s ------------------------------------------\n",stop_filename);
+          end_mc();
+          finalize_process();
+          return 0;
+        }
         if((i%flow.save_freq)==0) {
           //save_conf(&flow, flow.obsnmeas*j + i);
           save_conf(&flow, j, i);
           /* Only save state if we have a file to save to */
           if(rlx_var.rlxd_state[0]!='\0') {
             lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
-          write_ranlxd_state(rlx_var.rlxd_state);
+            write_ranlxd_state(rlx_var.rlxd_state);
           } 
         }
       }
