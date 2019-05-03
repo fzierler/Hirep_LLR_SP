@@ -42,4 +42,6 @@ void read_action(char *filename, integrator_par **ipp);
 void read_spinor_field_ascii(char filename[],spinor_field * sf);
 
 void print_mat(suNg* mat);
+
+int check_stopfile(char filename[]);
 #endif
