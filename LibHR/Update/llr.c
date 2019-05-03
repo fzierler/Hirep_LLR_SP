@@ -129,12 +129,13 @@ void robbinsmonro(int rm)
     if (rmstep % (llrp.umb_RM_freq) == 0)
       umbrella_swap(&S_llr, &llrp.S0, &llrp.a, &llrp.dS, &llrp.starta);
 #endif
+    lprintf("ROBBINSMONRO", 30, "RM%d Iteration: %d rmstep: %d SO= %lf dS= %lf S_llr= %lf S_non_llr= %lf  a_llr= %.9lf \n", rm, llrp.it, rmstep, llrp.S0, llrp.dS, S_llr, S_non_llr, llrp.a);
   }
 
   S_llr_avr /= (double)llrp.nrm;
   S_non_llr_avr /= (double)llrp.nrm;
   llrp.a += (S_llr_avr - llrp.S0) * llrp.cfactor / (llrp.dS * llrp.dS * llrp.it);
-  lprintf("ROBBINSMONRO", 0, "RM%d Iteration: %d SO= %lf dS= %lf S_llr= %lf S_non_llr= %lf  a_llr= %lf \n", rm, llrp.it, llrp.S0, llrp.dS, S_llr_avr, S_non_llr_avr, llrp.a);
+  lprintf("ROBBINSMONRO", 0, "RM%d Iteration: %d SO= %lf dS= %lf S_llr= %lf S_non_llr= %lf  a_llr= %.9lf \n", rm, llrp.it, llrp.S0, llrp.dS, S_llr_avr, S_non_llr_avr, llrp.a);
   llrp.it++;
 }
 
