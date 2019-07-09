@@ -209,6 +209,8 @@ int main(int argc,char *argv[]) {
   
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS);
   lprintf("MAIN",0,"[RepID: %d][world_size: %d]\n[MPI_ID: %d][MPI_size: %d]\n",RID,WORLD_SIZE,MPI_PID,MPI_WORLD_SIZE);
+  gethostname(sbuf,128);
+  lprintf("MAIN",0,"Hostname: %s\n",sbuf);
   lprintf("MAIN",0,"SVN Revision: %d\n", CI_svnrevision);
 
   //  lprintf("MAIN",0,"Logger lelvel: %d\n",logger_getlevel(0));
@@ -275,9 +277,17 @@ int main(int argc,char *argv[]) {
     eva_vecs=alloc_spinor_field_f(eigval_var.nevt,&glattice);
   }
 
+  lprintf("MAIN",0,"WF make %s\n",WF_var.make);
+  lprintf("MAIN",0,"WF tmax: %e\n",WF_var.tmax);
+  lprintf("MAIN",0,"WF number of measurements: %d\n",WF_var.nmeas);
+  lprintf("MAIN",0,"WF time lapse between measurements: %e\n",WF_var.tmax/WF_var.nmeas);
+  lprintf("MAIN",0,"WF number of integration intervals per measurement: %d\n",WF_var.nint);
+  lprintf("MAIN",0,"WF number of integration intervals: %d\n",WF_var.nint*WF_var.nmeas);
+  lprintf("MAIN",0,"WF integration step: %e\n",WF_var.tmax/(WF_var.nmeas*WF_var.nint));
 
   WF_initialize();
 
+  lprintf("MAIN",0,"Initial Plaquette: %.9f\n",avr_plaquette());
 
   rc=acc=0;
   for(i=flow.start;i<flow.end;++i) {
@@ -348,7 +358,7 @@ int main(int argc,char *argv[]) {
     if((i%flow.meas_freq)==0) {
       gettimeofday(&start,0);
       /* plaquette */
-      lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
+      lprintf("MAIN",0,"Plaquette: %.9f\n",avr_plaquette());
 
       
       /* Mesons */
@@ -392,7 +402,7 @@ int main(int argc,char *argv[]) {
 	E=WF_E(u_gauge);
 	Esym=WF_Esym(u_gauge);
 	TC=WF_topo(u_gauge);
-	lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %e %e %e %e %e %e\n",i,t,E,t*t*E,Esym,t*t*Esym,TC);
+	lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %f %1.8e %1.8e %1.8e %1.8e %1.8e\n",i,t,E,t*t*E,Esym,t*t*Esym,TC);
 
 	suNg_field_copy(wf_gauge,u_gauge);
 
@@ -413,7 +423,7 @@ int main(int argc,char *argv[]) {
 	      E=WF_E(wf_gauge);
 	      Esym=WF_Esym(wf_gauge);
 	      TC=WF_topo(wf_gauge);
-	      lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %e %e %e %e %e %e\n",i,t,E,t*t*E,Esym,t*t*Esym,TC);
+	      lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %f %1.8e %1.8e %1.8e %1.8e %1.8e\n",i,t,E,t*t*E,Esym,t*t*Esym,TC);
 	    }
 	    if (fabs(epsilon_new + 1.) > 1e-7) epsilon=epsilon_new;	
 	    if (fabs(epsilon_new +1.) < 1e-7 ) epsilon=epsilon/2;	
