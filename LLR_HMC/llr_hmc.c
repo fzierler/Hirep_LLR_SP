@@ -361,7 +361,7 @@ int main(int argc,char *argv[]) {
           E=WF_E(u_gauge);
           Esym=WF_Esym(u_gauge);
           TC=WF_topo(u_gauge);
-          lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %e %e %e %e %e %e\n",i,t,E,t*t*E,Esym,t*t*Esym,TC);
+          lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %f %1.8e %1.8e %1.8e %1.8e %1.8e\n",i,t,E,t*t*E,Esym,t*t*Esym,TC);
           
           suNg_field_copy(wf_gauge,u_gauge);
           
@@ -382,7 +382,7 @@ int main(int argc,char *argv[]) {
                 E=WF_E(wf_gauge);
                 Esym=WF_Esym(wf_gauge);
                 TC=WF_topo(wf_gauge);
-                lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %e %e %e %e %e %e\n",i,t,E,t*t*E,Esym,t*t*Esym,TC);
+                lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %f %1.8e %1.8e %1.8e %1.8e %1.8e\n",i,t,E,t*t*E,Esym,t*t*Esym,TC);
               }
               if (fabs(epsilon_new + 1.) > 1e-7) epsilon=epsilon_new;	
               if (fabs(epsilon_new +1.) < 1e-7 ) epsilon=epsilon/2;	
