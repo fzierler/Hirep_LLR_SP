@@ -225,12 +225,11 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
   rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
 
-  if(strcmp(rlx_var.rlxd_start,"continue")==0 && rlx_var.rlxd_state[0]!='\0')
-    {
-      /*load saved state*/
-      lprintf("MAIN",0,"Loading rlxd state from file [%s]\n",rlx_var.rlxd_state);
-      read_ranlxd_state(rlx_var.rlxd_state);
-    }
+  if(strcmp(rlx_var.rlxd_start,"continue")==0 && rlx_var.rlxd_state[0]!='\0') {
+    /*load saved state*/
+    lprintf("MAIN",0,"Loading rlxd state from file [%s]\n",rlx_var.rlxd_state);
+    read_ranlxd_state(rlx_var.rlxd_state);
+  }
 
 #ifdef GAUGE_SUN
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
@@ -332,8 +331,8 @@ int main(int argc,char *argv[]) {
       save_conf(&flow, i);
       /* Only save state if we have a file to save to */
       if(rlx_var.rlxd_state[0]!='\0') {
-	lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
-	write_ranlxd_state(rlx_var.rlxd_state);
+        lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
+        write_ranlxd_state(rlx_var.rlxd_state);
       }
     }
     
@@ -363,7 +362,7 @@ int main(int argc,char *argv[]) {
       
       /* Mesons */
       if(strcmp(mes_var.make,"true")==0) {
-	measure_spectrum_semwall(1,&mes_var.mesmass,mes_var.nhits,i,mes_var.precision);
+	      measure_spectrum_semwall(1,&mes_var.mesmass,mes_var.nhits,i,mes_var.precision);
       }
       
       /* Polyakov loops */
@@ -390,45 +389,44 @@ int main(int argc,char *argv[]) {
 
       /* WilsonFlow */
       if(strcmp(WF_var.make,"true")==0) {
-	double E, Esym, TC;
-	int k;
-	double epsilon=WF_var.eps;
-	double t=0.;
-	double dt = (double)WF_var.tmax/(double)WF_var.nmeas;
+	      double E, Esym, TC;
+	      int k;
+	      double epsilon=WF_var.eps;
+	      double t=0.;
+	      double dt = (double)WF_var.tmax/(double)WF_var.nmeas;
 
-	if(wf_gauge==NULL) wf_gauge=alloc_gfield(&glattice);
+	      if(wf_gauge==NULL) wf_gauge=alloc_gfield(&glattice);
 
 
-	E=WF_E(u_gauge);
-	Esym=WF_Esym(u_gauge);
-	TC=WF_topo(u_gauge);
-	lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %f %1.8e %1.8e %1.8e %1.8e %1.8e\n",i,t,E,t*t*E,Esym,t*t*Esym,TC);
-
-	suNg_field_copy(wf_gauge,u_gauge);
-
-	k=1;	
-	double epsilon_new=0;
-	while (t < WF_var.tmax)
-	  {	
-	    if (t+epsilon > (double)k*dt)
-	      epsilon = (double)k*dt - t; 
-	    
-	    epsilon_new=WilsonFlow3_adaptative(wf_gauge,epsilon,WF_var.delta);
-	    
-	    if ( fabs(epsilon_new+1.) > 1e-7) 
-	      t=t+epsilon;
-	    
-	    if ( fabs(t - (double)k*dt ) < 1e-7 ) {
-	      k=k+1;
-	      E=WF_E(wf_gauge);
-	      Esym=WF_Esym(wf_gauge);
-	      TC=WF_topo(wf_gauge);
+	      E=WF_E(u_gauge);
+	      Esym=WF_Esym(u_gauge);
+	      TC=WF_topo(u_gauge);
 	      lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %f %1.8e %1.8e %1.8e %1.8e %1.8e\n",i,t,E,t*t*E,Esym,t*t*Esym,TC);
-	    }
-	    if (fabs(epsilon_new + 1.) > 1e-7) epsilon=epsilon_new;	
-	    if (fabs(epsilon_new +1.) < 1e-7 ) epsilon=epsilon/2;	
-	    
-	  }
+
+	      suNg_field_copy(wf_gauge,u_gauge);
+
+        k=1;	
+        double epsilon_new=0;
+        while (t < WF_var.tmax) {	
+          if (t+epsilon > (double)k*dt)
+            epsilon = (double)k*dt - t; 
+            
+          epsilon_new=WilsonFlow3_adaptative(wf_gauge,epsilon,WF_var.delta);
+            
+          if ( fabs(epsilon_new+1.) > 1e-7) 
+            t=t+epsilon;
+            
+          if ( fabs(t - (double)k*dt ) < 1e-7 ) {
+            k=k+1;
+            E=WF_E(wf_gauge);
+            Esym=WF_Esym(wf_gauge);
+            TC=WF_topo(wf_gauge);
+            lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %f %1.8e %1.8e %1.8e %1.8e %1.8e\n",i,t,E,t*t*E,Esym,t*t*Esym,TC);
+          }
+          if (fabs(epsilon_new + 1.) > 1e-7) epsilon=epsilon_new;	
+          if (fabs(epsilon_new +1.) < 1e-7 ) epsilon=epsilon/2;	
+            
+        }
 	
       }
       gettimeofday(&end,0);
@@ -451,7 +449,7 @@ int main(int argc,char *argv[]) {
   free(n_inv_iter);
 #endif
   
-    /* finalize Monte Carlo */
+  /* finalize Monte Carlo */
   end_mc();
     
   /* close communications */
