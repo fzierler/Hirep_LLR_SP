@@ -1,0 +1,85 @@
+// Global variables 
+GLB_T = 4
+GLB_X = 20
+GLB_Y = 20
+GLB_Z = 20
+NP_T = 1
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+BC_SHIFT_X=0
+BC_SHIFT_Y=0
+BC_SHIFT_Z=0
+
+// Replicas
+N_REP = 1
+
+// Random generator
+rlx_level = 1
+rlx_seed = 13813
+rlx_start = new
+rlx_state = rand_state
+
+// Logger levels
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
+
+// make llr iterations
+// Number of MC steps per RM iteration
+// Number of MC therm steps per RM iteration
+// Robbins Monro startint iteration
+// Cfactor in RM a_llr updates
+// The last three variables are read from the pre.dat in David's code. 
+// pre.dat is a pre-generated csv files with the coloumns (E/S0, starta/A, dS)
+llr:make = 1   // unused in the code?
+llr:nmc  = 700
+llr:nth  = 300
+llr:it = 1
+llr:cfactor = 1.0
+llr:starta = 1.0 // from pre.dat
+llr:S0 = 1.0     // from pre.dat?
+llr:dS = 1.0   
+   // from pre.dat?
+
+// HMC_FLOW
+run name = run1
+gauge start = random
+rm steps = +10
+config dir = configs/
+save freq = 0
+meas freq = 0
+therm = 0
+inter rm therm = 0
+rm start = 0
+rm restart = 0 
+tlen = 1.0
+
+// Not read but inferred according to llr_hmc_utils.h
+Obs n meas = 0
+Obs meas start = 0 
+umbrella RM freq = 0
+umbrella meas freq = 0
+umbrella therm freq = 0
+
+// The following variables (theta, Schrödinger functional, Wilson flow) should not matter
+// We can leave the default values untouched
+
+// Variables inherited from standard HMC
+theta_T = 0.
+theta_X = 0.
+theta_Y = 0.
+theta_Z = 0.
+SF_zf = 1.
+SF_ds = 1.
+SF_ct = 1.
+SF_sign = 1
+
+// Wilson flow
+WF:make = 0
+WF:tmax = 12.5
+WF:nmeas = 126
+WF:nint = 1
+WF:eps = 0.01
+WF:delta = 0
+WF:def_glueball = 0
