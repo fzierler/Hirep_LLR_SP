@@ -4,3 +4,29 @@
 .settings/
 .vscode
 .svn/
+
+#Auto-generated files
+Include/.autoheaders.h
+Include/macro_opt.h
+Include/suN.h
+Include/suN_types.h
+Include/suN_repr_func.h
+Make/Utils/autosun/writeREPR
+LibHR/Update/approx_data.db
+LibHR/Utils/suN_exp.c
+
+#object, dependencies, library and info files
+*.o
+*.d
+*.a
+**/cinfo.c
+**/.test_failed
+**/out_0
+**/err_0
+**/debug
+
+# executeables
+HMC/hmc
+HMC/hmc_wf
+HMC/hmc_forces
+LLR_HMC/llr_hmc
