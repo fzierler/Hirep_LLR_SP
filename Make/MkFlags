@@ -39,7 +39,7 @@ MACRO += -DIO_FLUSH
 #MACRO += -DAMALLOC_MEASURE
 
 #Compiler
-CC = /opt/MPI/bin/mpicc
+CC = gcc
 #CC = clang
 CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2 -msse3
 #CFLAGS = -Wall -std=c99 -g
