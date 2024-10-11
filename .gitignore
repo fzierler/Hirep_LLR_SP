@@ -1,0 +1,6 @@
+.project
+.cproject
+.DS_Store
+.settings/
+.vscode
+.svn/
