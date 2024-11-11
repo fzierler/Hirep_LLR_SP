@@ -13,6 +13,8 @@ MACRO += -DWITH_MPI
 MACRO += -DWITH_UMBRELLA
 
 #Compiler
-CC = mpicc
-CFLAGS = -Wall -std=c99 -O3
+CC = gcc
+#CC = clang
+CFLAGS = -Wall -std=c99 -O3 -march=native
+#CFLAGS = -Wall -std=c99 -g
 LDFLAGS = 
