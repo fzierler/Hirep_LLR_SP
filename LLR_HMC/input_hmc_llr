@@ -1,8 +1,8 @@
-// Global variables 
+// Global variables
 GLB_T = 4
-GLB_X = 20
-GLB_Y = 20
-GLB_Z = 20
+GLB_X = 4
+GLB_Y = 4
+GLB_Z = 4
 NP_T = 1
 NP_X = 1
 NP_Y = 1
@@ -10,9 +10,9 @@ NP_Z = 1
 BC_SHIFT_X=0
 BC_SHIFT_Y=0
 BC_SHIFT_Z=0
-
 // Replicas
 N_REP = 1
+
 
 // Random generator
 rlx_level = 1
@@ -21,77 +21,62 @@ rlx_start = new
 rlx_state = rand_state
 
 // Logger levels
-log:default = -1
+log:default = 30
 log:inverter = -1
 log:forcestat = 0
 
-// make llr iterations
-// Number of MC steps per RM iteration
-// Number of MC therm steps per RM iteration
-// Robbins Monro startint iteration
-// Cfactor in RM a_llr updates
-// The last three variables are read from the pre.dat in Davids code. 
-// pre.dat is a pre-generated csv files with the coloumns (E/S0, starta/A, dS)
-llr:make = 1   // unused in the code?
-llr:nmc  = 700
-llr:nth  = 300
-llr:it = 100
-llr:cfactor = 1.0
-llr:starta = 1.0 // from pre.dat
-llr:S0 = 1.0     // from pre.dat?
-llr:dS = 1.0   
-   // from pre.dat?
-
-// HMC_FLOW
-run name = run1
-gauge start = unit
-rm steps = +10
-config dir = .
-save freq = 1
-meas freq = 1
-therm = 100
-inter rm therm = 50
-rm start = 1
-rm restart = 0 
-tlen = 1.0
-
-// Not read bt inferred according to llr_hmc_utils.h
-Obs n meas = 10
-Obs meas start = 1 
-umbrella RM freq = 0
-umbrella meas freq = 0
-umbrella therm freq = 0
-
-// The following variables (theta, Schrödinger functional, Wilson flow) should not matter
-// We can leave the default values untouched
-
-// Variables inherited from standard HMC
+// Fermion twisting
 theta_T = 0.
 theta_X = 0.
 theta_Y = 0.
 theta_Z = 0.
+
+// HMC variables
+tlen = 1.0
+
+// Schroedinger functional
 SF_zf = 1.
 SF_ds = 1.
 SF_ct = 1.
 SF_sign = 1
 
-// Wilson flow
-WF:make = 0
-WF:tmax = 12.5
-WF:nmeas = 126
-WF:nint = 1
-WF:eps = 0.01
-WF:delta = 0
-WF:def_glueball = 0
+// Runtime variables
+therm = 2
+run name = run1
+config dir = .
+gauge start = random
+rm steps = 20
+rm restart = 1
+Obs n meas = 2
+meas freq = 2
+last conf = +2
 
+
+// LLR/RM
+llr:make = true
+llr:nmc = 20
+llr:nth = 10
+llr:it = 8
+llr:starta = -1.0
+llr:dS = 20.
+llr:S0 = 1020.
+ 
+//Wilson flow parameters
+WF:make = false
+WF:tmax = 2.0
+WF:nmeas = 1
+WF:nint=100
+
+
+//Monomials
 monomial {
 	id = 0
 	type = llr_gauge
-	beta = 6.0
+	beta = 2.4265
 	level = 0
 }
 integrator {
    level = 0
    type = o2mn
-   steps = 2
+   steps = 5
 }
