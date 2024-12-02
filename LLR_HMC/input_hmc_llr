@@ -50,6 +50,7 @@ rm restart = 1
 Obs n meas = 2
 meas freq = 2
 last conf = +2
+save freq = 1
 
 
 // LLR/RM
