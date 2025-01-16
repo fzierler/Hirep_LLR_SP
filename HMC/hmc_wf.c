@@ -1,13 +1,13 @@
 /****************************************************************************
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+ * Copyright (c) 2008, Claudio Pica                                          *   
+ * All rights reserved.                                                      * 
 \***************************************************************************/
 
 /*******************************************************************************
-*
-* Main HMC program
-*
-*******************************************************************************/
+ *
+ * Main HMC program
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -30,7 +30,39 @@
 #include "utils.h"
 #include "spectrum.h"
 #include "cinfo.c"
+#include "wilsonflow.h"
 
+
+/*WF parameters*/
+typedef struct _input_WF {
+  char make[256];
+  double tmax;
+  int nmeas,nint;
+  double eps;
+  double delta;
+  int def_glueball;
+
+  /* for the reading function */
+  input_record_t read[8];
+
+} input_WF;
+
+#define init_input_WF(varname)						\
+  {									\
+    .read={								\
+      {"make WF", "WF:make = %s", STRING_T, (varname).make},		\
+      {"WF max integration time", "WF:tmax = %lf", DOUBLE_T, &((varname).tmax)}, \
+      {"WF number of measures", "WF:nmeas = %d", DOUBLE_T, &((varname).nmeas)},	\
+      {"WF number of integration steps between measures", "WF:nint = %d", INT_T, &((varname).nint)}, \
+      {"WF initial epsilon", "WF:eps = %lf", DOUBLE_T, &((varname).eps)}, \
+      {"WF delta", "WF:delta = %lf", DOUBLE_T, &((varname).delta)},	\
+      {"enable glueball", "WF:def_glueball = %d",INT_T, &(varname).def_glueball}, \
+      {NULL, NULL,0,NULL}						\
+    }									\
+  }
+
+input_WF WF_var = init_input_WF(WF_var);
+suNg_field* wf_gauge=NULL;
 
 /* Mesons parameters */
 typedef struct _input_mesons {
@@ -44,16 +76,16 @@ typedef struct _input_mesons {
   
 } input_mesons;
 
-#define init_input_mesons(varname) \
-{ \
-  .read={\
-    {"make mesons", "mes:make = %s", STRING_T, (varname).make},\
-    {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
-    {"number of noisy sources per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
-    {"valence mass", "mes:mass = %lf", DOUBLE_T, &(varname).mesmass},\
-    {NULL, NULL, INT_T, NULL}\
-  }\
-}
+#define init_input_mesons(varname)					\
+  {									\
+    .read={								\
+      {"make mesons", "mes:make = %s", STRING_T, (varname).make},	\
+      {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision}, \
+      {"number of noisy sources per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits}, \
+      {"valence mass", "mes:mass = %lf", DOUBLE_T, &(varname).mesmass},	\
+      {NULL, NULL, INT_T, NULL}						\
+    }									\
+  }
 
 
 input_mesons mes_var = init_input_mesons(mes_var);
@@ -67,13 +99,13 @@ typedef struct _input_polyakov {
   
 } input_polyakov;
 
-#define init_input_polyakov(varname) \
-{ \
-  .read={\
-    {"make polyakov loops", "poly:make = %s", STRING_T, (varname).make},\
-    {NULL, NULL, INT_T, NULL}\
-  }\
-}
+#define init_input_polyakov(varname)					\
+  {									\
+    .read={								\
+      {"make polyakov loops", "poly:make = %s", STRING_T, (varname).make}, \
+      {NULL, NULL, INT_T, NULL}						\
+    }									\
+  }
 
 
 input_polyakov poly_var = init_input_polyakov(poly_var);
@@ -95,20 +127,20 @@ typedef struct _input_eigval {
   
 } input_eigval;
 
-#define init_input_eigval(varname) \
-{ \
-  .read={\
-    {"make lowest eigenvalues", "eva:make = %s", STRING_T, (varname).make},\
-    {"search space dimension", "eva:nevt = %d", INT_T, &(varname).nevt},\
-    {"number of accurate eigenvalues", "eva:nev = %d", INT_T, &(varname).nev},\
-    {"max degree of polynomial", "eva:kmax = %d", INT_T, &(varname).kmax},\
-    {"max number of subiterations", "eva:maxiter = %d", INT_T, &(varname).maxiter},\
-    {"absolute precision", "eva:omega1 = %lf", DOUBLE_T, &(varname).omega1},\
-    {"relative precision", "eva:omega2 = %lf", DOUBLE_T, &(varname).omega2},\
-    {"Dirac op mass", "eva:mass = %lf", DOUBLE_T, &(varname).evamass},\
-    {NULL, NULL, INT_T, NULL}\
-  }\
-}
+#define init_input_eigval(varname)					\
+  {									\
+    .read={								\
+      {"make lowest eigenvalues", "eva:make = %s", STRING_T, (varname).make}, \
+      {"search space dimension", "eva:nevt = %d", INT_T, &(varname).nevt}, \
+      {"number of accurate eigenvalues", "eva:nev = %d", INT_T, &(varname).nev}, \
+      {"max degree of polynomial", "eva:kmax = %d", INT_T, &(varname).kmax}, \
+      {"max number of subiterations", "eva:maxiter = %d", INT_T, &(varname).maxiter}, \
+      {"absolute precision", "eva:omega1 = %lf", DOUBLE_T, &(varname).omega1}, \
+      {"relative precision", "eva:omega2 = %lf", DOUBLE_T, &(varname).omega2}, \
+      {"Dirac op mass", "eva:mass = %lf", DOUBLE_T, &(varname).evamass}, \
+      {NULL, NULL, INT_T, NULL}						\
+    }									\
+  }
 
 input_eigval eigval_var = init_input_eigval(eigval_var);
 
@@ -136,7 +168,7 @@ static void read_cmdline(int argc, char* argv[]) {
   }
 
   error(argc!=requested,1,"read_cmdline [hmc.c]",
-      "Arguments: [-i <input file>] [-o <output file>] [-m]");
+	"Arguments: [-i <input file>] [-o <output file>] [-m]");
 
   if (ao!=0) strcpy(output_filename,argv[ao]);
   if (ai!=0) strcpy(input_filename,argv[ai]);
@@ -177,8 +209,6 @@ int main(int argc,char *argv[]) {
   
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS);
   lprintf("MAIN",0,"[RepID: %d][world_size: %d]\n[MPI_ID: %d][MPI_size: %d]\n",RID,WORLD_SIZE,MPI_PID,MPI_WORLD_SIZE);
-  gethostname(sbuf,sbuf_len);
-  lprintf("MAIN",0,"Hostname: %s\n", sbuf);
   lprintf("MAIN",0,"SVN Revision: %d\n", CI_svnrevision);
 
   //  lprintf("MAIN",0,"Logger lelvel: %d\n",logger_getlevel(0));
@@ -194,11 +224,11 @@ int main(int argc,char *argv[]) {
   rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
 
   if(strcmp(rlx_var.rlxd_start,"continue")==0 && rlx_var.rlxd_state[0]!='\0')
-  {
-    /*load saved state*/
-    lprintf("MAIN",0,"Loading rlxd state from file [%s]\n",rlx_var.rlxd_state);
-    read_ranlxd_state(rlx_var.rlxd_state);
-  }
+    {
+      /*load saved state*/
+      lprintf("MAIN",0,"Loading rlxd state from file [%s]\n",rlx_var.rlxd_state);
+      read_ranlxd_state(rlx_var.rlxd_state);
+    }
 
 #ifdef GAUGE_SUN
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
@@ -213,6 +243,7 @@ int main(int argc,char *argv[]) {
   read_input(mes_var.read,input_filename);
   read_input(poly_var.read,input_filename);
   read_input(eigval_var.read,input_filename);
+  read_input(WF_var.read,input_filename);
   
   /* Init Monte Carlo */
   init_mc(&flow, input_filename);
@@ -243,6 +274,11 @@ int main(int argc,char *argv[]) {
     eva_vals=malloc(sizeof(double)*eigval_var.nevt);
     eva_vecs=alloc_spinor_field_f(eigval_var.nevt,&glattice);
   }
+
+
+  WF_initialize();
+
+
   rc=acc=0;
   for(i=flow.start;i<flow.end;++i) {
     int rr;
@@ -286,8 +322,8 @@ int main(int argc,char *argv[]) {
       save_conf(&flow, i);
       /* Only save state if we have a file to save to */
       if(rlx_var.rlxd_state[0]!='\0') {
-          lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
-          write_ranlxd_state(rlx_var.rlxd_state);
+	lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
+	write_ranlxd_state(rlx_var.rlxd_state);
       }
     }
     
@@ -310,8 +346,10 @@ int main(int argc,char *argv[]) {
 #endif
 
     if((i%flow.meas_freq)==0) {
+      gettimeofday(&start,0);
       /* plaquette */
       lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
+
       
       /* Mesons */
       if(strcmp(mes_var.make,"true")==0) {
@@ -339,29 +377,77 @@ int main(int argc,char *argv[]) {
           lprintf("LOWEIG",0,"Eig %d = %1.15e\n",n,eva_vals[n]);
         }
       }
+
+      /* WilsonFlow */
+      if(strcmp(WF_var.make,"true")==0) {
+	double E, Esym, TC;
+	int k;
+	double epsilon=WF_var.eps;
+	double t=0.;
+	double dt = (double)WF_var.tmax/(double)WF_var.nmeas;
+
+	if(wf_gauge==NULL) wf_gauge=alloc_gfield(&glattice);
+
+
+	E=WF_E(u_gauge);
+	Esym=WF_Esym(u_gauge);
+	TC=WF_topo(u_gauge);
+	lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %e %e %e %e %e %e\n",i,t,E,t*t*E,Esym,t*t*Esym,TC);
+
+	suNg_field_copy(wf_gauge,u_gauge);
+
+	k=1;	
+	double epsilon_new=0;
+	while (t < WF_var.tmax)
+	  {	
+	    if (t+epsilon > (double)k*dt)
+	      epsilon = (double)k*dt - t; 
+	    
+	    epsilon_new=WilsonFlow3_adaptative(wf_gauge,epsilon,WF_var.delta);
+	    
+	    if ( fabs(epsilon_new+1.) > 1e-7) 
+	      t=t+epsilon;
+	    
+	    if ( fabs(t - (double)k*dt ) < 1e-7 ) {
+	      k=k+1;
+	      E=WF_E(wf_gauge);
+	      Esym=WF_Esym(wf_gauge);
+	      TC=WF_topo(wf_gauge);
+	      lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %e %e %e %e %e %e\n",i,t,E,t*t*E,Esym,t*t*Esym,TC);
+	    }
+	    if (fabs(epsilon_new + 1.) > 1e-7) epsilon=epsilon_new;	
+	    if (fabs(epsilon_new +1.) < 1e-7 ) epsilon=epsilon/2;	
+	    
+	  }
+	
+      }
+      gettimeofday(&end,0);
+      timeval_subtract(&etime,&end,&start);
+      lprintf("MAIN",0,"Measurements on Traj #%d performed in [%ld sec %ld usec]\n",i,etime.tv_sec,etime.tv_usec);
     }
-  }
+  }    
   /* save final configuration */
   if(((--i)%flow.save_freq)!=0) {
     save_conf(&flow, i);
     /* Only save state if we have a file to save to */
     if(rlx_var.rlxd_state[0]!='\0') {
-        lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
-        write_ranlxd_state(rlx_var.rlxd_state);
+      lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
+      write_ranlxd_state(rlx_var.rlxd_state);
     }
   }
-  
 #ifdef MEASURE_FORCE
   free(force_ave);
   free(force_max);
   free(n_inv_iter);
 #endif
   
-  /* finalize Monte Carlo */
+    /* finalize Monte Carlo */
   end_mc();
-  
+    
   /* close communications */
   finalize_process();
+  
+  if(wf_gauge!=NULL) free_gfield(wf_gauge);
   
   return 0;
   

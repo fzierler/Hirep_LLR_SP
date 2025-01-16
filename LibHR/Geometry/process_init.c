@@ -123,7 +123,37 @@ int setup_replicas() {
     sprintf(sbuf,"Rep_%d",RID);
     mpiret = chdir(sbuf);
   }
+
+#ifdef WITH_UMBRELLA
+
+  MPI_Group group_world;  
+  MPI_Group umbrella_world;
+    
+  int tmp[N_REP],umb_nodes[N_REP];
+  int GID;
+  int i;
+
+  for(i=0;i<N_REP;i++) {
+    tmp[i]=0;
+    umb_nodes[i]=0;
+  }  
+
+  MPI_Comm_rank(MPI_COMM_WORLD,&GID);
+
+  if(PID==0) tmp[RID]=GID;
   
+  MPI_Allreduce(tmp,umb_nodes,N_REP,MPI_INT,MPI_SUM,MPI_COMM_WORLD);
+    
+  MPI_Comm_group(MPI_COMM_WORLD, &group_world);
+  
+  MPI_Barrier(MPI_COMM_WORLD);
+ 
+  MPI_Group_incl(group_world,N_REP,umb_nodes,&umbrella_world);
+  MPI_Comm_create(MPI_COMM_WORLD,umbrella_world,&UMB_WORLD);
+
+  if(PID==0) MPI_Comm_rank(UMB_WORLD,&UID);
+
+#endif //ifdef WITH_UMBRELLA
 #endif //ifdef WITH_MPI
   
   return 0;

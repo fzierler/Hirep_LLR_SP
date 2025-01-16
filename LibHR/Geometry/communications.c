@@ -11,6 +11,7 @@
 #include "spinor_field.h"
 #include "suN_types.h"
 #include "global.h"
+#include "update.h"
 #include "utils.h"
 #include <string.h>
 #ifdef WITH_MPI
@@ -319,6 +320,7 @@ void start_gf_sendrecv(suNg_field *gf) {
   /* bisognerebbe forse avere una variabile di stato nei campi?? */
   complete_gf_sendrecv(gf);
 
+
   /* fill send buffers */
   sync_gauge_field(gf);
 
@@ -366,6 +368,69 @@ void start_gf_sendrecv(suNg_field *gf) {
       error(1,1,"start_gf_sendrecv " __FILE__,"Cannot start receive buffer");
     }
 #endif
+
+
+    /*
+      if shifted 
+      force complete field transfer.
+
+      shift field
+      
+      (for test write 0 in the remaining missed buffer)
+
+
+(0,0,0,0) <= (t,x,y,z) < (T+2*T_BORDER,X+2*X_BORDER,Y+2*Y_BORDER,Z+2*Z_BORDER)
+
+
+n[i] e' sul reticolo esteso
+
+if(X_BORDER != 0 || Y_BORDER != 0 || Z_BORDER != 0)
+
+for(n[1]=0;n[1]<X+2*X_BORDER;n[1]++)
+for(n[2]=0;n[2]<Y+2*Y_BORDER;n[2]++)
+for(n[3]=0;n[3]<Z+2*Z_BORDER;n[3]++)
+n[0]=0
+
+sono fuori se 
+n[1]+SHIFT_X==X+2*X_BORDER && X_BORDER!=0
+or
+n[2]+SHIFT_Y==Y+2*Y_BORDER && Y_BORDER!=0
+or
+n[3]+SHIFT_Z==Z+2*Z_BORDER && Z_BORDER!=0
+
+shift_x*shift_y*shift_z*X_BORDER*Y_BORDER*Z_BORDER
+
+shift_X*(X-1) shift_Y*shift_Z*Y_BORDER*Z_BORDER*(X-1)
+shift_Y*(Y-1) shift_X*shift_Z*X_BORDER*Z_BORDER*(Y-1)
+shift_Z*(Z-1) shift_X*shift_Y*X_BORDER*Y_BORDER(Z-1)
+
+((Y-1)*(Z-1))*shift_X*BORDER_X
+
+
+
+init shifted
+
+n[0]=0
+for(n[1]=0;n[1]<X+2*X_BORDER;n[1]++)
+for(n[2]=0;n[2]<Y+2*Y_BORDER;n[2]++)
+for(n[3]=0;n[3]<Z+2*Z_BORDER;n[3]++)
+if(n[1]+shift_X==X+2*X_BORDER || n[2]+shift_Y==Y+2*Y_BORDER || n[3]+shift_Z==Z+2*Z_BORDER)
+next=id
+if(n[1]+shift_X==X+2*X_BORDER ) next=proc_up[next,1];
+if(n[2]+shift_Y==Y+2*Y_BORDER ) next=proc_up[next,2];
+if(n[3]+shift_Z==Z+2*Z_BORDER ) next=proc_up[next,3];
+
+if(next!=id)
+add_shift_mem[next]++;
+map(n[1],n[2],n[3])=add_shift_mem[next]
+
+
+
+
+
+      then send and complete again
+
+*/
 
   }
 
@@ -572,3 +637,57 @@ void start_gt_sendrecv(suNg_field *gf) {
 #endif /* WITH_MPI */
 }
 
+
+#ifdef WITH_UMBRELLA
+void umbrella_swap(double* S_llr,double* S0, double* a, double* dS, double* starta)
+{
+
+
+  int mpiret; (void)mpiret;
+
+  lprintf("SWAP",10,"Starting Rep Par S0 = %f dS = %f a = %f \n",*S0,*dS,*a);
+   
+  /*wait on every processor*/
+  mpiret=MPI_Barrier(MPI_COMM_WORLD);
+  double data[5*N_REP];
+  double locdata[5];
+  
+  locdata[0]=*S_llr;
+  locdata[1]=*S0;
+  locdata[2]=*a;
+  locdata[3]=*dS;
+  locdata[4]=*starta;
+  
+  if(PID==0) {
+    mpiret=MPI_Gather(locdata,5,MPI_DOUBLE,data,5,MPI_DOUBLE,0,UMB_WORLD);  
+#ifndef NDEBUG
+    if (mpiret != MPI_SUCCESS) {
+      char mesg[MPI_MAX_ERROR_STRING];
+      int mesglen;
+      MPI_Error_string(mpiret,mesg,&mesglen);
+      lprintf("MPI",0,"ERROR: %s\n",mesg);
+      error(1,1,"umbrella_swap " __FILE__,"Cannot complete gather");
+    }
+#endif
+    if(UID==0)
+      swap(data);      
+    mpiret=MPI_Scatter(data,5,MPI_DOUBLE,locdata,5,MPI_DOUBLE,0,UMB_WORLD);
+#ifndef NDEBUG
+    if (mpiret != MPI_SUCCESS) {
+      char mesg[MPI_MAX_ERROR_STRING];
+      int mesglen;
+      MPI_Error_string(mpiret,mesg,&mesglen);
+      lprintf("MPI",0,"ERROR: %s\n",mesg);
+      error(1,1,"umbrella_swap " __FILE__,"Cannot complete scatter");
+    }
+#endif
+    
+  }
+
+  bcast(locdata,5);
+  setreplica(locdata);
+
+  lprintf("SWAP",10,"New Rep Par S0 = %f dS = %f a = %f \n",*S0,*dS,*a);
+
+}
+#endif //WITH_UMBRELLA

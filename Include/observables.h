@@ -24,6 +24,9 @@
 double plaq(int ix,int mu,int nu);
 void cplaq(complex *ret,int ix,int mu,int nu);
 double avr_plaquette();
+double temporal_plaquette();
+double temporal_plaquette_dir(int dir);
+double spatial_wall_plaq(int it);
 double SF_action(double beta);
 double local_plaq(int ix);
 void full_plaquette();
@@ -36,6 +39,20 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *m, do
 void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *m, double acc);
 void pta_qprop_MINRES(int g0[4], spinor_field **pta_qprop, int nm, double *m, double acc);
 
+//emt operators//
+void clover_F(suNg_algebra_vector *F, int ix, int mu, int nu);
+double EMT_E(int ix);
+double EMT_Es(int ix);
+double EMT_Et(int ix);
+double EMT_Ec(int ix);
+double EMT_Ecs(int ix);
+double EMT_Ect(int ix);
+double EMT_Y(int ix, int mu, int nu);
+double EMT_Y00(int ix);
+double avg_EMT_Y00();
+double EMT_Y0k(int ix,int k);
+double avg_EMT_Y0k(int k);
+//emt operators end//
 
 typedef enum {NO_DILUTION, TIME_DILUTION, TIME_SPIN_DILUTION, EXACT} dilution_mode;
 typedef struct _ata_qprop_pars {

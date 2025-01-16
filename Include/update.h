@@ -12,6 +12,7 @@
 
 void staples(int ix,int mu,suNg *v);
 void test_staples();
+void spatial_staples(int ix,int mu,suNg *v);
 void cabmar(double beta,suNg *u, suNg *v,int type);
 
 void project_gauge_field(void);
@@ -33,7 +34,9 @@ void mre_init(mre_par*, int, double);
 
 /* forces for the update */
 void force0(double dt, suNg_av_field *force, void *par);
+void force_llr_0(double dt, suNg_av_field *force, void *par,double* action);
 
+void force_obs_0pp(double dt, suNg_av_field *force, void *vpar);
 typedef struct {
   int n_pf;
   spinor_field *pf;
@@ -58,9 +61,19 @@ typedef struct {
   mre_par mpar;
 } force_hmc_par;
 
+typedef struct {
+  int t0,t1;
+  double shift;
+} force_obs_0pp_par;
+
+
+
 void force_fermion_core(spinor_field* Xs, spinor_field* Ys, suNg_av_field* force, double dt, double* forcestat, int type);
 void force_hmc(double dt, suNg_av_field *force, void *par);
 void force_hmc_tm(double dt, suNg_av_field *force, void *par);
+void force_llr_hmc(double dt, suNg_av_field *force, void *par, double* action);
+
+spinor_field * get_hmc_spinor_Xs();
 
 
 void gaussian_momenta(suNg_av_field *momenta);
@@ -83,8 +96,37 @@ typedef enum {
   TM_alt,
   Hasenbusch,
   Hasenbusch_tm,
-  Hasenbusch_tm_alt
+  Hasenbusch_tm_alt,
+  LLRPureGauge,
+  LLR_obs_0pp,
+  LLR_HMC,
+  NUM_MON_TYPE
 } mon_type;
+
+#ifdef MAIN_PROGRAM
+int is_llr[NUM_MON_TYPE]={
+0,//PureGauge
+0,//HMC
+0,//RHMC
+0,//TM
+0,//TM_alt
+0,//Hasenbusch
+0,//Hasenbusch_tm
+0,//Hasenbusch_tm_alt
+1,//LLRPureGauge
+1,//LLR_obs_0pp
+1};//LLR_HMC
+#else
+extern int is_llr[NUM_MON_TYPE];
+#endif
+
+
+typedef struct _mon_obs_0pp_par{
+  force_obs_0pp_par fpar;
+  int t0,t1;
+  double shift;
+} mon_obs_0pp_par;
+
 
 typedef struct _mon_pg_par {
   double beta;
@@ -147,6 +189,7 @@ typedef struct _monomial {
   void (*free)(struct _monomial *m); /* free memory */
   
   void (*force_f)(double dt, suNg_av_field *force, void *par); /* force function */
+  void (*force_and_action_f)(double dt, suNg_av_field *force, void *par,double* action); /* force function */
   void *force_par; /* parameters for the force function */
 
   void (*init_traj)(const struct _monomial *m);
@@ -155,9 +198,22 @@ typedef struct _monomial {
   void (*correct_la_pf)(const struct _monomial *m);
   const spinor_field *(*pseudofermion)(const struct _monomial *m); /* returns ps field pointer */
   void (*add_local_action)(const struct _monomial *m, scalar_field *loc_action);
+  void (*add_llr_local_action)(const struct _monomial *m, scalar_field *loc_action);
   
 } monomial;
 
+typedef struct _monomials_action {
+double *Hold;
+double *Hnew;
+double *Snew, *Sold, *momold, *momnew, *Snew_llr, *Sold_llr;
+} monomials_action;
+
+
+
+
+struct _monomial* llr_obs_0pp_create(const monomial_data *data);
+struct _monomial* llr_gauge_create(const monomial_data *data);
+struct _monomial* llr_hmc_create(const monomial_data *data);
 struct _monomial* pg_create(const monomial_data *data);
 struct _monomial* hmc_create(const monomial_data *data);
 struct _monomial* rhmc_create(const monomial_data *data);
@@ -207,7 +263,10 @@ typedef struct _ghmc_par {
 
 void init_ghmc(ghmc_par *par);
 void free_ghmc();
+void setstep();
 int update_ghmc();
+int update_ghmc_adapt();
+int update_llr_ghmc(double *S_llr,double *S_non_llr,int therm);
 
 
 
@@ -227,11 +286,33 @@ void local_hmc_action(local_action_type type,
 void pf_local_action(scalar_field *loc_action,
                      spinor_field *pf);
 
+void local_llr_hmc_action(double * S, double * S_llr, double * mom,scalar_field *loc_action,scalar_field *loc_llr_action,suNg_av_field *momenta);
 
 void suNg_field_copy(suNg_field *g1, suNg_field *g2);
 void suNf_field_copy(suNf_field *g1, suNf_field *g2);
 
 /* find spectral interval using eva */
 void find_spec_H2(double *max, double *min);
+
+
+
+/* ROBBINS MONRO*/
+
+//void total_llr_action(double * S_llr);
+void thermrobbinsmonro(void);
+void measrobbinsmonro(void);
+void robbinsmonro(void);
+void restart_robbinsmonro(int it);
+void init_robbinsmonro(int nrm,int nth,double starta,int it,int swap,double dS,double S0);
+double getdS(void);
+double get_llr_a(void);
+double getS0(void);
+void llr_fixed_a_update(void);
+
+#ifdef WITH_UMBRELLA
+void swap(double *data);
+void setreplica(double *data);
+#endif
+
 
 #endif

@@ -5,7 +5,7 @@
 
 #include "global.h"
 #include "logger.h"
-#include "hmc_utils.h"
+#include "llr_hmc_utils.h"
 #include "random.h"
 #include "io.h"
 #include "representation.h"
@@ -44,54 +44,13 @@ static double beta(){
   return 0;
 }
 
+
 static double mass(){
-  integrator_par *ip=hmc_var.hmc_p.integrator;
-  double min=10000.;
-  while (ip!=NULL){
-    for (int n=0;n<ip->nmon;n++){
-      double nm=min;
-      const monomial* m=ip->mon_list[n];
-      if (m->data.type==HMC){
-        nm = ((mon_hmc_par*) m->data.par)->mass;
-      }
-      else if (m->data.type==RHMC){
-        nm = ((mon_rhmc_par*) m->data.par)->mass;
-      }
-      else if (m->data.type==TM || m->data.type==TM_alt){
-        nm = ((mon_tm_par*) m->data.par)->mass;
-      }
-      else if (m->data.type==Hasenbusch){
-        nm = ((mon_hasenbusch_par*) m->data.par)->mass;
-      }
-      else if (m->data.type==Hasenbusch_tm || m->data.type==Hasenbusch_tm_alt){
-        nm = ((mon_hasenbusch_tm_par*) m->data.par)->mass;
-      }
-      if (nm<min) min=nm;
-    }
-    ip=ip->next;
-  }
-  return min;
+  return 0;
 }
 
 static int nf(){
-  int nf=0;
-  integrator_par *ip=hmc_var.hmc_p.integrator;
-  while (ip!=NULL){
-    for (int n=0;n<ip->nmon;n++){
-      const monomial* m=ip->mon_list[n];
-      if (m->data.type==HMC){
-        nf+=2;
-      }
-      else if (m->data.type==RHMC){
-        nf+=2;
-      }
-      else if (m->data.type==TM){
-        nf+=2;
-      }
-    }
-    ip=ip->next;
-  }
-  return nf;
+  return 0;
 }
 
 static void mk_gconf_name(char *name, hmc_flow *rf, int id) {
@@ -226,6 +185,7 @@ int init_mc(hmc_flow *rf, char *ifile) {
   strcpy(rf->conf_dir,"./");
   rf->save_freq=0;
   rf->meas_freq=0;
+  rf->therm=0;
   rf->hmc_v=&hmc_var;
 
   read_input(hmc_var.read,ifile);
@@ -293,7 +253,9 @@ int init_mc(hmc_flow *rf, char *ifile) {
   represent_gauge_field();
 
   /* init HMC */
+
   read_action(ifile, &hmc_var.hmc_p.integrator);
+
   init_ghmc(&hmc_var.hmc_p);
 
   return 0;

@@ -12,6 +12,7 @@
 #include "communications.h"
 #include "wilsonflow.h"
 #include <math.h>
+#include <float.h>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327
@@ -183,94 +184,154 @@ static void WF_Exp(suNg *u, suNg *X) {
 #endif
 }
 
-/*#elif NG==3*/
+#elif NG==3
+ 
+ static void WF_Exp(suNg *u, suNg *X) { 
+   suNg X2;
+   double c[3], tmp;
+   complex s[3];
+   double alpha, beta;
+   double err;
+   int n;
+   int M;
 
+#ifdef EXP_CHECK
+#define _X_(a,b) (X->c[a+3*b])
+   lprintf("WILSONFLOW",0,"WF EXP CHECK tr(X) = %e + I %e\n",_X_(0,0).re+_X_(1,1).re+_X_(2,2).re,_X_(0,0).im+_X_(1,1).im+_X_(2,2).im); 
+  #undef _X_
+   suNg Xadj;
+   _suNg_dagger(Xadj,*X);
+   _suNg_add_assign(Xadj,*X);
+   _suNg_sqnorm(tmp,Xadj); 
+   lprintf("WILSONFLOW",0,"WF EXP CHECK ||X + Xdag|| = %e\n",sqrt(tmp)); 
+   lprintf("WILSONFLOW",0,"X =");
+   lprintf("WILSONFLOW",0,"{{(%f) + (%f)I ,",X->c[0]);
+   lprintf("WILSONFLOW",0," (%f) + (%f)I ,",X->c[1]);
+   lprintf("WILSONFLOW",0," (%f) + (%f)I },",X->c[2]);
+   lprintf("WILSONFLOW",0," {(%f) + (%f)I ,",X->c[3]);
+   lprintf("WILSONFLOW",0," (%f) + (%f)I ,",X->c[4]);
+   lprintf("WILSONFLOW",0," (%f) + (%f)I} ,",X->c[5]);
+   lprintf("WILSONFLOW",0," {(%f) + (%f)I ,",X->c[6]);
+   lprintf("WILSONFLOW",0," (%f) + (%f)I ,",X->c[7]);
+   lprintf("WILSONFLOW",0," (%f) + (%f)I}}\n",X->c[8]);
+#endif 
 
-/* static void WF_Exp(suNg *u, suNg *X) { */
-/*   suNg X2; */
-/*   complex c[3], s[3], tmp; */
-/*   double alpha, beta; */
-/*   double norm, error; */
-/*   int n; */
-  
-  
-/* /\* X2 = X.X *\/ */
-/*   _suNg_times_suNg(X2,*X,*X); */
-  
-/* /\* alpha = Im det(X) *\/ */
-/*   #define _X_(a,b) (X->c[a+3*b]) */
-/*   #define ImProd(a,b,c) (a.re*(b.re*c.im+b.im*c.re)+a.im*(b.re*c.re-b.im*c.im)) */
-/*   alpha= */
-/*     +ImProd(_X_(0,0),_X_(1,1),_X_(2,2)) */
-/*     +ImProd(_X_(0,1),_X_(1,2),_X_(2,0)) */
-/*     +ImProd(_X_(0,2),_X_(1,0),_X_(2,1)) */
-/*     -ImProd(_X_(0,2),_X_(1,1),_X_(2,0)) */
-/*     -ImProd(_X_(0,1),_X_(1,0),_X_(2,2)) */
-/*     -ImProd(_X_(0,0),_X_(1,2),_X_(2,1)); */
-/*   #undef _X_ */
-/*   #undef ImProd */
-  
-/* /\* beta = tr (X2) / 2 *\/ */
-/* /\* norm = sqrt( |tr (X2)| ) *\/ */
-/*   #define _X2_(a,b) (X2.c[a+3*b]) */
-/*   beta=(_X2_(0,0).re+_X2_(1,1).re+_X2_(2,2).re)/2.; */
-/*   norm=sqrt(-_X2_(0,0).re-_X2_(1,1).re-_X2_(2,2).re); */
-/*   #undef _X2_ */
-  
-/*   s[0].re = 1.;          s[0].im = alpha/6.; */
-/*   s[1].re = 1.+beta/6.;  s[1].im = 0.; */
-/*   s[2].re = .5;          s[2].im = 0.; */
-  
-/*   n=3; */
-/*   c[0].re = 0.;          c[0].im = alpha/6.; */
-/*   c[1].re = beta/6.;     c[1].im = 0.; */
-/*   c[2].re = 0.;          c[2].im = 0.; */
-  
-/*   /\* error = |X|^{n+1}/(n+1)! exp(|X|) *\/   */
-/*   error= exp(norm)*norm*norm*norm*norm/24.; */
-/* #error The error must be rechecked!!! */
+   /* X2 = X.X */ 
+   _suNg_times_suNg(X2,*X,*X); 
 
-/*   /\* */
-/*   c[0][n] = i*c[2][n-1]*alpha/n */
-/*   c[1][n] = (c[0][n-1]+c[2][n-1]*beta)/n */
-/*   c[2][n] = c[1][n-1]/n */
-/*   *\/ */
-/*   while(1) { */
-/*     n++; */
-/*     tmp=c[1]; */
-/*     c[1].re=(c[0].re+c[2].re*beta)/n; */
-/*     c[1].im=(c[0].im+c[2].im*beta)/n; */
-/*     c[0].re=-c[2].im*alpha/n; */
-/*     c[0].im=c[2].re*alpha/n; */
-/*     c[2].re=tmp.re/n; */
-/*     c[2].im=tmp.im/n; */
+   /* alpha = Im det(X) */ 
+#define _X_(a,b) (X->c[a+3*b])
+#define ImProd(a,b,c) (a.re*(b.re*c.im+b.im*c.re)+a.im*(b.re*c.re-b.im*c.im)) 
+  alpha= 
+    +ImProd(_X_(0,0),_X_(1,1),_X_(2,2)) 
+    +ImProd(_X_(0,1),_X_(1,2),_X_(2,0)) 
+    +ImProd(_X_(0,2),_X_(1,0),_X_(2,1)) 
+    -ImProd(_X_(0,2),_X_(1,1),_X_(2,0)) 
+    -ImProd(_X_(0,1),_X_(1,0),_X_(2,2)) 
+    -ImProd(_X_(0,0),_X_(1,2),_X_(2,1)); 
+  #undef _X_ 
+  #undef ImProd
+
+  /* beta = - tr (X2) / 2 */
+#define _X2_(a,b) (X2.c[a+3*b]) 
+  beta=-(_X2_(0,0).re+_X2_(1,1).re+_X2_(2,2).re)/2.; 
+  #undef _X2_ 
+  
+  M=1;
+  while(fabs(alpha)>=M*(M*M-beta)) {
+    M*=2;
+    error(M>1000000,1,"wilsonflow.c","WF_Exp: ||X|| is too large!");
+  }  
+  alpha=alpha/(M*M*M);
+  beta=beta/(M*M);
+
+#ifdef EXP_CHECK
+  lprintf("WF",0,"alpha = %e    beta = %e    M = %d\n",alpha,beta,M);
+#endif
+
+  s[0].re = 1.;          s[0].im = alpha/6.;
+  s[1].re = 1.-beta/6.;  s[1].im = 0.;
+  s[2].re = .5;          s[2].im = 0.;
+
+  n=3;
+  c[0] = -alpha/6.;
+  c[1] = beta/6.;
+  c[2] = 0.;
+
+  /*
+  (-iT)^n / n! = c[2][n] (-iT)^2 + c[1][n] (-iT) + c[0][n]
+  
+  c[0][n] = -c[2][n-1]*alpha/n 
+  c[1][n] = (c[0][n-1] + c[2][n-1]*beta)/n 
+  c[2][n] = c[1][n-1]/n
+  */ 
+  err=3./24.;
+  while(err>DBL_EPSILON) { 
+    n++; 
+    tmp=c[1];
+    c[1]=(c[0]+c[2]*beta)/n; 
+    c[0]=-c[2]*alpha/n;
+    c[2]=tmp/n;
+
+    switch(n%4) {
+    case 0:
+      s[0].re+=c[0];
+      s[1].im-=c[1];
+      s[2].re-=c[2];
+      break;
+      
+    case 1:
+      s[0].im+=c[0];
+      s[1].re+=c[1];
+      s[2].im-=c[2];
+      break;
+
+    case 2:
+      s[0].re-=c[0];
+      s[1].im+=c[1];
+      s[2].re+=c[2];
+      break;
+
+    case 3:
+      s[0].im-=c[0];
+      s[1].re-=c[1];
+      s[2].im+=c[2];
+    }
     
-/*     s[0].re+=c[0].re; s[0].im+=c[0].im; */
-/*     s[1].re+=c[1].re; s[1].im+=c[1].im; */
-/*     s[2].re+=c[2].re; s[2].im+=c[2].im; */
+    err/=(n+1);
+    
+#ifdef EXP_CHECK
+    lprintf("WF",0,"s=( %e , %e , %e , %e , %e , %e ) c=( %e , %e , %e )\n",s[0].re,s[0].im,s[1].re,s[1].im,s[2].re,s[2].im,c[0],c[1],c[2]);
+#endif
 
-/*     error *= norm/(n+1); */
-/*     if(error < 1.e-20) break; */
-/*   } */
+  }
+
+  s[1].re/=M;     s[1].im/=M;
+  s[2].re/=M*M;   s[2].im/=M*M;
+  _suNg_zero(*u); 
+  u->c[0].re=s[0].re; u->c[0].im=s[0].im;
+  u->c[4].re=s[0].re; u->c[4].im=s[0].im;
+  u->c[8].re=s[0].re; u->c[8].im=s[0].im;
+  for(int i=0; i<9; i++) { 
+    _complex_mul_assign(u->c[i],s[1],X->c[i]); 
+    _complex_mul_assign(u->c[i],s[2],X2.c[i]); 
+  } 
+
+  while(M>1) {
+    _suNg_times_suNg(X2,*u,*u);
+    *u=X2;
+    M/=2;
+  }
   
-/*   _suNg_zero(*u); */
-/*   u->c[0].re=s[0].re; u->c[0].im=s[0].im; */
-/*   u->c[4].re=s[0].re; u->c[4].im=s[0].im; */
-/*   u->c[8].re=s[0].re; u->c[8].im=s[0].im; */
-/*   for(int i=0; i<9; i++) { */
-/*     _complex_mul_assign(u->c[i],s[1],X->c[i]); */
-/*     _complex_mul_assign(u->c[i],s[2],X2.c[i]); */
-/*   } */
-  
-/* #ifdef EXP_CHECK */
-/*   suNg v; */
-/*   WF_Exp_check(&v,X); */
-/*   _suNg_sub_assign(v,*u); */
-/*   _suNg_sqnorm(error,v); */
-/*   lprintf("WILSONFLOW",0,"WF EXP CHECK %e\n",sqrt(error)); */
-/* #endif */
-  
-/* } */
+#ifdef EXP_CHECK 
+  suNg v;
+  double error;
+  WF_Exp_check(&v,X); 
+  _suNg_sub_assign(v,*u); 
+  _suNg_sqnorm(error,v); 
+  lprintf("WILSONFLOW",0,"WF EXP CHECK %e\n",sqrt(error)); 
+#endif 
+ } 
   
 #else
 

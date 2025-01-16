@@ -188,12 +188,22 @@ void free_BCs() {
 }
 
 
+#ifdef BC_T_ANTIPERIODIC
 static void sp_T_antiperiodic_BCs();
+#endif
+#ifdef BC_X_ANTIPERIODIC
 static void sp_X_antiperiodic_BCs();
+#endif
+#ifdef BC_Y_ANTIPERIODIC
 static void sp_Y_antiperiodic_BCs();
+#endif
+#ifdef BC_Z_ANTIPERIODIC
 static void sp_Z_antiperiodic_BCs();
+#endif
 /*static void sp_spatial_theta_BCs(double theta);*/
+#ifdef ROTATED_SF
 static void chiSF_ds_BT(double ds);
+#endif
 
 void apply_BCs_on_represented_gauge_field() {
 #ifdef BC_T_ANTIPERIODIC
@@ -217,8 +227,13 @@ void apply_BCs_on_represented_gauge_field() {
 }
 
 
+#if defined(BASIC_SF) || defined(ROTATED_SF)
 static void gf_Dirichlet_BCs(suNg* dn, suNg* up);
+#endif
+#ifdef BC_T_OPEN
 static void gf_open_BCs();
+#endif
+
 
 void apply_BCs_on_fundamental_gauge_field() {
   complete_gf_sendrecv(u_gauge);
@@ -231,8 +246,12 @@ void apply_BCs_on_fundamental_gauge_field() {
 }
 
 
+#if defined(BASIC_SF) || defined(ROTATED_SF)
 static void mf_Dirichlet_BCs(suNg_av_field *force);
+#endif
+#ifdef BC_T_OPEN
 static void mf_open_BCs(suNg_av_field *force);
+#endif
 
 void apply_BCs_on_momentum_field(suNg_av_field *force) {
 #if defined(BASIC_SF) || defined(ROTATED_SF)
@@ -243,11 +262,14 @@ void apply_BCs_on_momentum_field(suNg_av_field *force) {
 #endif
 }
 
-
+#if defined(BASIC_SF) || defined(BC_T_OPEN)
 static void sf_Dirichlet_BCs(spinor_field *sp);
 static void sf_Dirichlet_BCs_flt(spinor_field_flt *sp);
+#endif
+#if defined(ROTATED_SF)
 static void sf_open_BCs(spinor_field *sp);
 static void sf_open_BCs_flt(spinor_field_flt *sp);
+#endif
 
 void apply_BCs_on_spinor_field(spinor_field *sp) {
 #if defined(BASIC_SF) || defined(BC_T_OPEN)
@@ -275,6 +297,7 @@ void apply_BCs_on_spinor_field_flt(spinor_field_flt *sp) {
 /* BOUNDARY CONDITIONS TO BE APPLIED ON THE REPRESENTED GAUGE FIELD        */
 /***************************************************************************/
 
+#ifdef BC_T_ANTIPERIODIC
 static void sp_T_antiperiodic_BCs() {
   if(COORD[0]==0) {
     int index;
@@ -289,7 +312,8 @@ static void sp_T_antiperiodic_BCs() {
     }
   }
 }
-
+#endif
+#ifdef BC_X_ANTIPERIODIC
 static void sp_X_antiperiodic_BCs() {
   if(COORD[1]==0) {
     int index;
@@ -304,7 +328,8 @@ static void sp_X_antiperiodic_BCs() {
     }
   }
 }
-
+#endif
+#ifdef BC_Y_ANTIPERIODIC
 static void sp_Y_antiperiodic_BCs() {
   if(COORD[2]==0) {
     int index;
@@ -319,7 +344,8 @@ static void sp_Y_antiperiodic_BCs() {
     }
   }
 }
-
+#endif
+#ifdef BC_Z_ANTIPERIODIC
 static void sp_Z_antiperiodic_BCs() {
   if(COORD[3]==0) {
     int index;
@@ -334,7 +360,7 @@ static void sp_Z_antiperiodic_BCs() {
     }
   }
 }
-
+#endif
 
 
 /*
@@ -367,6 +393,7 @@ static void sp_spatial_theta_BCs(double theta) {
 
 
 
+#ifdef ROTATED_SF
 static void chiSF_ds_BT(double ds) {
   if(COORD[0] == 0) {
     int index;
@@ -401,7 +428,7 @@ static void chiSF_ds_BT(double ds) {
     }
   }
 }
-
+#endif
 
 
 
@@ -473,7 +500,7 @@ static void init_gf_SF_BCs(suNg* dn, suNg* up) {
 #endif
 #endif
 
-
+#if defined(BASIC_SF) || defined(ROTATED_SF)
 static void gf_Dirichlet_BCs(suNg* dn, suNg* up) {
   int index;
   int ix, iy, iz;
@@ -551,9 +578,9 @@ static void gf_Dirichlet_BCs(suNg* dn, suNg* up) {
     }
   }
 }
+#endif
 
-
-
+#ifdef BC_T_OPEN
 static void gf_open_BCs() {
   int index;
   int ix, iy, iz;
@@ -614,7 +641,7 @@ static void gf_open_BCs() {
     }
   }
 }
-
+#endif
 
 
 
@@ -622,7 +649,7 @@ static void gf_open_BCs() {
 /***************************************************************************/
 /* BOUNDARY CONDITIONS TO BE APPLIED ON THE MOMENTUM FIELDS                */
 /***************************************************************************/
-
+#if defined(BASIC_SF) || defined(ROTATED_SF)
 static void mf_Dirichlet_BCs(suNg_av_field *force) {
   int ix,iy,iz,index;
   
@@ -679,7 +706,8 @@ static void mf_Dirichlet_BCs(suNg_av_field *force) {
     }
   }
 }
-
+#endif
+#ifdef BC_T_OPEN
 static void mf_open_BCs(suNg_av_field *force) {
   int ix,iy,iz,index;
   
@@ -726,7 +754,7 @@ static void mf_open_BCs(suNg_av_field *force) {
     }
   }
 }
-
+#endif
 
 
 
@@ -735,7 +763,7 @@ static void mf_open_BCs(suNg_av_field *force) {
 /***************************************************************************/
 /* BOUNDARY CONDITIONS TO BE APPLIED ON THE SPINOR FIELDS                  */
 /***************************************************************************/
-
+#if defined(BASIC_SF) || defined(BC_T_OPEN)
 static void sf_Dirichlet_BCs(spinor_field *sp) {
   int ix,iy,iz,index;
   if(COORD[0] == 0) {
@@ -784,8 +812,8 @@ static void sf_Dirichlet_BCs_flt(spinor_field_flt *sp) {
     }
   }
 }
-
-
+#endif
+#if defined(ROTATED_SF)
 static void sf_open_BCs(spinor_field *sp) {
   int ix,iy,iz,index;
   if(COORD[0] == 0) {
@@ -810,7 +838,7 @@ static void sf_open_BCs_flt(spinor_field_flt *sp) {
     }
   }
 }
-
+#endif
 
 
 

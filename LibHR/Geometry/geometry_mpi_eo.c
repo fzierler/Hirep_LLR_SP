@@ -153,6 +153,13 @@ static void geometry_mpi_init()
 
   lprintf("GEOMETRY",200,"NBORDER=%d L3BORDER=%d\n",N_BORDER,L3_BORDER);
   
+  
+  if( (BC_SHIFT_X!=0 || BC_SHIFT_Y!=0 || BC_SHIFT_Z!=0) && N_BORDER!=0 ){
+     error(1==1,1,"geometry_mpi_init [geometry_mpi.c]",
+  	    "shifted bc have been implemented only for serial lattice");
+  }
+    
+
 
   /*   printf("volume di un bordo %d\n",BOR_CUBE/4+BOR_SQUARE/4);   */
   /*   printf("volume totale %d\n",TOTAL_VOLUME); */
@@ -1229,7 +1236,8 @@ static int correnspondig_buffer(int * bf , int i){
 
 static void  fix_next_neightbours()
 {
-  int x0,x1,x2,x3,ix;
+  int x0,x1,x2,x3,ix,sx,sy,sz;
+
   for (x3=0;x3<Z+2*Z_BORDER;x3++)
     for (x2=0;x2<Y+2*Y_BORDER;x2++)
       for (x1=0;x1<X+2*X_BORDER;x1++)
@@ -1240,15 +1248,32 @@ static void  fix_next_neightbours()
 	    
 	    ipt(x0-T_BORDER,x1-X_BORDER,x2-Y_BORDER,x3-Z_BORDER)=ix ;
 
+
+
+
 	    if(ix != -1)
 	      {
-	    	iup(ix,0)=map_overlexi2id[local_index(x0+1,x1,x2,x3)];
-	    	idn(ix,0)=map_overlexi2id[local_index(x0-1,x1,x2,x3)];
+		sx=sy=sz=0;
+		if(x0==1) {
+		  sx = BC_SHIFT_X;
+		  sy = BC_SHIFT_Y;
+		  sz = BC_SHIFT_Z;
+		} 
+	    	iup(ix,0)=map_overlexi2id[local_index(x0+1,x1+sx,x2+sy,x3+sz)];
 	    	iup(ix,1)=map_overlexi2id[local_index(x0,x1+1,x2,x3)];
-	    	idn(ix,1)=map_overlexi2id[local_index(x0,x1-1,x2,x3)];
 	    	iup(ix,2)=map_overlexi2id[local_index(x0,x1,x2+1,x3)];
-	    	idn(ix,2)=map_overlexi2id[local_index(x0,x1,x2-1,x3)];
 	    	iup(ix,3)=map_overlexi2id[local_index(x0,x1,x2,x3+1)];
+
+
+		sx=sy=sz=0;
+		if(x0==2) {
+		  sx = BC_SHIFT_X;
+		  sy = BC_SHIFT_Y;
+		  sz = BC_SHIFT_Z;
+		} 
+	    	idn(ix,0)=map_overlexi2id[local_index(x0-1,x1-sx,x2-sy,x3-sz)];
+	    	idn(ix,1)=map_overlexi2id[local_index(x0,x1-1,x2,x3)];
+	    	idn(ix,2)=map_overlexi2id[local_index(x0,x1,x2-1,x3)];
 	    	idn(ix,3)=map_overlexi2id[local_index(x0,x1,x2,x3-1)];
 	      }
    

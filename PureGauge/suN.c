@@ -26,12 +26,8 @@
 #include "logger.h"
 #include "memory.h"
 #include "communications.h"
-#include "observables.h"
 #include "utils.h"
 #include "suN_utils.h"
-
-
-
 #include "cinfo.c"
 
 
@@ -179,12 +175,14 @@ int main(int argc,char *argv[])
       
       /* plaquette */
       lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
+      /* Temporal plaquette*/
+      //lprintf("MAIN",0,"T_0k: %1.8e\n",avg_EMT_Y0k(1)*flow.pg_v->beta/(2.*(double)NG));
 
       /* Polyakov loops */
       if(strcmp(poly_var.make,"true")==0) {
         polyakov();
       }
-              
+             
       gettimeofday(&end,0);
       timeval_subtract(&etime,&end,&start);
       lprintf("MAIN",0,"Trajectory #%d: observables measured in [%ld sec %ld usec]\n",i,etime.tv_sec,etime.tv_usec);

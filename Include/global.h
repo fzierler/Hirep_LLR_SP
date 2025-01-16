@@ -60,6 +60,13 @@ GLB_VAR(int,X_EXT,=0);
 GLB_VAR(int,Y_EXT,=0);
 GLB_VAR(int,Z_EXT,=0);
 
+//shifted boundary conditions
+
+//not working with parallel simulations
+GLB_VAR(int,BC_SHIFT_X,=0); 
+GLB_VAR(int,BC_SHIFT_Y,=0);
+GLB_VAR(int,BC_SHIFT_Z,=0);
+
 /* MPI stuff */
 GLB_VAR(int,WORLD_SIZE,=1); /* mpi rank for this process */
 GLB_VAR(int,CART_SIZE,=1); /* mpi rank for this process */
@@ -70,7 +77,11 @@ GLB_VAR(int,MPI_PID,=0); /* mpi rank inside MPI_COMM_WORLD (unique across replic
 #include <mpi.h>
 GLB_VAR(MPI_Comm,GLB_COMM,=MPI_COMM_WORLD); /* this is the global communicator for a replica */
 GLB_VAR(MPI_Comm,cart_comm,=MPI_COMM_NULL); /* cartesian communicator for the replica */
-#endif
+#ifdef WITH_UMBRELLA
+GLB_VAR(MPI_Comm,UMB_WORLD); /* Communicator for umbrella swap */
+GLB_VAR(int,UID,=-1); /* Process ID of the nodes inside the UMBRELLA group */
+#endif //WITH_UMBRELLA
+#endif //WITH_MPI
 
 GLB_VAR(int,RID,=0); /* Replica ID of this process */
 GLB_VAR(int,PID,=0); /* Process ID inside a replica */
@@ -169,13 +180,17 @@ GLB_VAR(complex,eitheta[4],={{1.,0.}});
 #endif
 
 
-#ifdef MEASURE_FORCE
-#define MEASURE_FORCE0
-#define MEASURE_FORCEHMC
-GLB_VAR(double,*force_ave,=NULL);
-GLB_VAR(double,*force_max,=NULL);
-GLB_VAR(int,*n_inv_iter,=NULL);
-#endif
+//LLR VAR
+GLB_VAR(double,llr_S0,=0);
+GLB_VAR(double,llr_dS,=0);
+
+
+
+//#ifdef ADAPTIVE
+//GLB_VAR(double,*force_ave,=NULL);
+//GLB_VAR(double,*force_max,=NULL);
+//GLB_VAR(int,*n_inv_iter,=NULL);
+//#endif
 
 #undef GLB_VAR
 

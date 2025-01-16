@@ -48,35 +48,44 @@ const monomial *add_mon(monomial_data *mon_dat) {
   
   /* create new monomial */
   switch (mon_dat->type) {
-    case PureGauge:
-      new_mon->m = pg_create(mon_dat);
-      break;
-    case HMC:
-      new_mon->m = hmc_create(mon_dat);
-      break;
-    case RHMC:
-      new_mon->m = rhmc_create(mon_dat);
-      break;
-    case TM:
-      new_mon->m = tm_create(mon_dat);
-      break;
-    case TM_alt:
-      new_mon->m = tm_alt_create(mon_dat);
-      break;
-    case Hasenbusch:
-      new_mon->m = hasen_create(mon_dat);
-      break;
-    case Hasenbusch_tm:
-      new_mon->m = hasen_tm_create(mon_dat);
-      break;
-    case Hasenbusch_tm_alt:
-      new_mon->m = hasen_tm_alt_create(mon_dat);
-      break;
-    default:
-      lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
-      break;
+  case LLR_HMC:
+    new_mon->m = llr_hmc_create(mon_dat);
+    break;
+  case LLR_obs_0pp:
+    new_mon->m = llr_obs_0pp_create(mon_dat);
+    break;
+  case LLRPureGauge:
+    new_mon->m = llr_gauge_create(mon_dat);
+    break;
+  case PureGauge:
+    new_mon->m = pg_create(mon_dat);
+    break;
+  case HMC:
+    new_mon->m = hmc_create(mon_dat);
+    break;
+  case RHMC:
+    new_mon->m = rhmc_create(mon_dat);
+    break;
+  case TM:
+    new_mon->m = tm_create(mon_dat);
+    break;
+  case TM_alt:
+    new_mon->m = tm_alt_create(mon_dat);
+    break;
+  case Hasenbusch:
+    new_mon->m = hasen_create(mon_dat);
+    break;
+  case Hasenbusch_tm:
+    new_mon->m = hasen_tm_create(mon_dat);
+    break;
+  case Hasenbusch_tm_alt:
+    new_mon->m = hasen_tm_alt_create(mon_dat);
+    break;
+  default:
+    lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
+    break;
   }
-
+  
   return new_mon->m;
 }
 
@@ -93,9 +102,3 @@ const monomial *mon_n(int i) {
   while (i>0) { curr=curr->next; i--; }
   return curr->m;
 }
-
-
-
-
-
-

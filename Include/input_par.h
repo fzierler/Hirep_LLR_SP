@@ -30,7 +30,7 @@ typedef struct _input_glb {
   /* int N_REP; */
 
   /* for the reading function */
-  input_record_t read[10];
+  input_record_t read[13];
   
 } input_glb;
 
@@ -45,6 +45,9 @@ typedef struct _input_glb {
     {"NP_X", "NP_X = %d", INT_T, &NP_X},\
     {"NP_Y", "NP_Y = %d", INT_T, &NP_Y},\
     {"NP_Z", "NP_Z = %d", INT_T, &NP_Z},\
+    {"BC_SHIFT_X", "BC_SHIFT_X = %d", INT_T, &BC_SHIFT_X},\
+    {"BC_SHIFT_Y", "BC_SHIFT_Y = %d", INT_T, &BC_SHIFT_Y},\
+    {"BC_SHIFT_Z", "BC_SHIFT_Z = %d", INT_T, &BC_SHIFT_Z},\
     {"N_REP", "N_REP = %d", INT_T, &N_REP},\
     {NULL, NULL, INT_T, NULL}				    \
   }\

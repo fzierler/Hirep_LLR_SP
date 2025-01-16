@@ -77,12 +77,28 @@ static double find_double(section *sec, char *key)
    return 0;
 }
 
+static int find_int(section *sec, char *key)
+{
+   for(int i = 0; i < sec->num; i++)
+   {
+      if(strcmp(key, sec->key[i]) == 0)
+      {
+         last_error = 0;
+         return atoi(sec->value[i]);
+      }
+   }
+
+   last_error = 1;
+   return 0;
+}
+
 static void add_monomial_to_integrator(const monomial *m, int level)
 {
    integrator_par *iter = ip;
    while(iter->level != level) iter = iter->next;
    iter->mon_list[iter->nmon] = m;
    iter->nmon++;
+
 }
 
 static void setup_monomials()
@@ -104,6 +120,7 @@ static void setup_monomials()
 
       level = find_double(cur, "level");
       check(last_error, "Unable to find 'level' in monomial");
+
       check(level<0||level>=n_int, "Invalid integrator level %d in monomial\n", level);
 
       if(strcmp(type, "gauge") == 0)
@@ -121,6 +138,44 @@ static void setup_monomials()
 
          // Monomial information
          lprintf("ACTION", 10, "Monomial %d: level = %d, type = gauge, beta = %1.6f\n", i, level, par->beta);
+      }
+      else if(strcmp(type, "llr_gauge") == 0)
+      {
+         mon_pg_par *par = malloc(sizeof(*par));
+         data.par = par;
+         data.type = LLRPureGauge;
+
+         // Find parameters
+         par->beta = find_double(cur, "beta");
+         check(last_error, "Unable to find 'beta' in monomial of type 'llr_gauge'\n");
+         
+         // Add monomial
+         mret = add_mon(&data);
+
+         // Monomial information
+         lprintf("ACTION", 10, "Monomial %d: level = %d, type = llr_gauge, beta = %1.6f\n", i, level, par->beta);
+      }
+      else if(strcmp(type, "llr_obs_0pp") == 0)
+      {
+
+	mon_obs_0pp_par *par = malloc(sizeof(*par));
+	data.par=par;
+	data.type = LLR_obs_0pp;
+	
+	par->shift = find_double(cur, "shift");
+	check(last_error, "Unable to find 'shift' in monomial of type 'llr_obs_0pp'\n");
+	
+	par->t0 = find_int(cur, "t0");
+	check(last_error, "Unable to find 't0' in monomial of type 'llr_obs_0pp'\n");
+	
+	par->t1 = find_int(cur, "t1");
+	check(last_error, "Unable to find 't1' in monomial of type 'llr_obs_0pp'\n");
+	
+	// Add monomial
+	mret = add_mon(&data);
+	
+	// Monomial information
+	lprintf("ACTION", 10, "Monomial %d: level = %d, type = 'llr_obs_0pp'\n", i, level);
       }
       else if(strcmp(type, "hmc") == 0)
       {
@@ -147,9 +202,35 @@ static void setup_monomials()
          // Monomial information
          lprintf("ACTION", 10, "Monomial %d: level = %d, type = hmc, mass = %1.6f, force_prec = %1.2e, mt_prec = %1.2e\n",
                  i, level, par->mass, data.force_prec, data.MT_prec);
-      }
+      }      
+      else if(strcmp(type, "llr_hmc") == 0)
+	{
+	  mon_hmc_par *par = malloc(sizeof(*par));
+	  data.par = par;
+	  data.type = LLR_HMC;
+	  
+	  // Find parameters
+	  par->mass = find_double(cur, "mass");
+	  check(last_error, "Unable to find 'mass' in monomial of type 'hmc'\n");
+
+	  data.MT_prec = find_double(cur, "mt_prec");
+	  check(last_error, "Unable to find 'mt_prec' in monomial of type 'hmc'\n");
+
+	  data.force_prec = find_double(cur, "force_prec");
+	  check(last_error, "Unable to find 'force_prec' in monomial of type 'hmc'\n");
+	  
+	  par->mre_past = find_double(cur, "mre_past");
+	  check(last_error, "Unable to find 'mre_past' in monomial of type 'hmc'\n");
+	  
+	  // Add monomial
+	  mret = add_mon(&data);
+	  
+	  // Monomial information
+	  lprintf("ACTION", 10, "Monomial %d: level = %d, type = llr_hmc, mass = %1.6f, force_prec = %1.2e, mt_prec = %1.2e\n",
+		  i, level, par->mass, data.force_prec, data.MT_prec);
+	}
       else if(strcmp(type, "tm") == 0)
-      {
+	{
          mon_tm_par *par = malloc(sizeof(*par));
          data.par = par;
          data.type = TM;

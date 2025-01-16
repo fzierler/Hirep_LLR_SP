@@ -268,6 +268,7 @@ if ($suff eq "g") { #algebra operations only for gauge
 	write_algebra_vector_mul();
 	write_algebra_vector_zero();
 	write_algebra_vector_sqnorm();
+        write_algebra_vector_prod();
 }
 
 print <<END
@@ -1216,6 +1217,42 @@ sub write_algebra_vector_sqnorm {
 		}
 		print "   } while(0) \n\n";
 	}
+}
+
+sub write_algebra_vector_prod {
+  print "/* k=Scalar product r*s (r,s algabra vectors)  */\n";
+  print "#define _algebra_vector_prod_${suff}(k,r,s) \\\n";
+  my $last=$N*$N-1;
+  if ($N<$Nmax or $last<(4*$unroll+1) ) { #unroll all
+    print "   (k)=";
+    my $n=0;
+                for(my $i=0;$i<$last;$i++){
+                        print "((r).$cname\[$i\]*(s).$cname\[$i\])";
+                        $n+=$N+1;
+                        if($i==$last-1) { print "\n\n"; } else { print "+ \\\n       "; }
+                }
+        } else { #partial unroll                                          
+                print "   do { \\\n";
+                print "      int _i,_n=0;\\\n";
+                print "      (k)=0.;\\\n";
+                print "      for (_i=0; _i<$avd; ){\\\n";
+                print "         (k)+=";
+                my $n=2*$unroll;
+                for(my $i=0;$i<2*$unroll;$i++){
+                        if ($i==0) { print "((r).$cname\[_i\]*(s).$cname\[_i\])"; }
+                        else { print "((r).$cname\[_i+$i\]*(s).$cname\[_i+$i\])"; }
+                        if($i==2*$unroll-1) { print ";\\\n"; } else { print "+ \\\n              "; }
+                }
+                print "         _i+=$n;\\\n";
+                print "      }\\\n";
+                print "      (k)+=" unless ($avr==0);
+                for(my $i=0;$i<$avr;$i++){
+                        if ($i==0) { print "((r).$cname\[_i\]*(s).$cname\[_i\])"; }
+                        else { print "((r).$cname\[_i+$i\]*(s).$cname\[_i+$i\])"; }
+                        if($i==$avr-1) { print ";\\\n"; } else { print "+ \\\n           "; }
+                }
+                print "   } while(0) \n\n";
+        }
 }
 
 sub write_vector_lc {

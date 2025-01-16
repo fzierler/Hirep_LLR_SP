@@ -33,7 +33,6 @@ void force0(double dt, suNg_av_field *force, void *vpar){
 
   /* check input types */
   _TWO_SPINORS_MATCHING(u_gauge,force);
-  
   double beta = *((double*)vpar);
 #ifdef MEASURE_FORCE0
   double forcestat[2]={0.,0.}; /* used for computation of avr and max force */
@@ -75,7 +74,7 @@ void force0(double dt, suNg_av_field *force, void *vpar){
     force_max[0]+=dt*forcestat[1];    
     //  }
 #endif
-  
+
   apply_BCs_on_momentum_field(force);
 
   #ifdef TIMING
@@ -86,5 +85,6 @@ void force0(double dt, suNg_av_field *force, void *vpar){
   timeval_subtract(&etime,&end,&start);
   lprintf("TIMING",0,"force0 %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
   #endif
+
 }
 

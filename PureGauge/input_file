@@ -1,16 +1,23 @@
 // Global variables
-GLB_T = 8
-GLB_X = 8
-GLB_Y = 8
-GLB_Z = 8
+BC_SHIFT_X=0
+BC_SHIFT_Y=0
+BC_SHIFT_Z=0
+GLB_T = 20
+GLB_X = 20
+GLB_Y = 20
+GLB_Z = 20
 NP_T = 2
 NP_X = 2
 NP_Y = 2
-NP_Z = 1
+NP_Z = 4
 
 N_REP = 1
 
-level = 1  seed = 12345
+// Random generator
+rlx_level = 1
+rlx_seed = 13813
+rlx_start = new
+rlx_state = rand_state
 
 //Logger levels (default = -1)
 log:default = -1
@@ -18,23 +25,23 @@ log:inverter = -1
 log:forcestat = 0
 
 // Pure gauge variables
-beta  =   5.6
+beta  =   6.09
 nhb   =   1
 nor   =   4
 nit   =   1 
 
 // Run control variables
-therm = 10
+therm = 1000
 run name = run1
-save freq = 1
-meas freq = 1 
-conf dir = cnfg
-gauge start = ranDoM
-//gauge start = Unit
-//gauge start = run1_8x2x2x2nc2rADJnf2b2.000000m1.310000n10
+save freq = 20000
+meas freq = 10
+conf dir = Cnfg
+//gauge start = ranDoM
+gauge start = unit
+//gauge start = run1_8x8x8x8nc2b5.600000n15
 //rlx_state =
 //rlx_start =
-last conf = 15
+last conf = +20000
 
 //Polyakov
 poly:make = false

@@ -93,3 +93,46 @@ void test_staples()
   lprintf("TESTING",50," [diff1 = %1.8e][diff2 = %1.8e][diff3 = %1.8e]\n", pa-ps, pl-ps, pa-pl);
 }
 #endif
+
+
+
+void spatial_staples(int ix,int mu,suNg *v)
+{
+  suNg staple, tr1, tr2;
+  
+  int ixpmu=iup(ix,mu);
+
+  _suNg_zero(*v);
+  
+  for (int i=1;i<4;i++) {
+    int nu=(mu+i)&0x3;
+    if(nu!=0){
+      int ixpnu=iup(ix,nu);
+      int ixmnu=idn(ix,nu);
+      int ixpmumnu=idn(ixpmu,nu);
+      
+      //Up Staple
+      _suNg_times_suNg(tr2,*pu_gauge(ix,nu),*pu_gauge(ixpnu,mu));
+      _suNg_dagger(tr1,*pu_gauge(ixpmu,nu));
+      _suNg_times_suNg(staple,tr2,tr1);
+#ifdef PLAQ_WEIGHTS
+      if(plaq_weight!=NULL) {
+	_suNg_mul(staple,plaq_weight[ix*16+nu*4+mu],staple);
+      }
+#endif
+      _suNg_add_assign(*v,staple);
+      
+      //Down Staple
+      _suNg_times_suNg(tr2,*pu_gauge(ixmnu,mu),*pu_gauge(ixpmumnu,nu));
+      _suNg_dagger(tr1,*pu_gauge(ixmnu,nu));
+      _suNg_times_suNg(staple,tr1,tr2);
+#ifdef PLAQ_WEIGHTS
+      if(plaq_weight!=NULL) {
+	_suNg_mul(staple,plaq_weight[ixmnu*16+mu*4+nu],staple);
+      }
+#endif
+      _suNg_add_assign(*v,staple);
+    }
+  }
+}
+

@@ -27,6 +27,7 @@ MACRO += -DBC_Z_PERIODIC
 
 #MACRO += -DUPDATE_EO
 #MACRO += -DWITH_MPI
+#MACRO += -DWITH_UMBRELLA
 #MACRO += -DWITH_QUATERNIONS
 MACRO += -DNDEBUG
 #MACRO += -DCHECK_SPINOR_MATCHING
@@ -36,14 +37,10 @@ MACRO += -DIO_FLUSH
 #MACRO += -DTIMING
 #MACRO += -DTIMING_WITH_BARRIERS
 #MACRO += -DAMALLOC_MEASURE
-MACRO += -DMEASURE_FORCE
 
 #Compiler
-#CC = mpicc
-#CC = gcc
-CC = clang
-#CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2 
-CFLAGS = -Wall -std=c99 -O3
-
-
+CC = /opt/MPI/bin/mpicc
+#CC = clang
+CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2 -msse3
+#CFLAGS = -Wall -std=c99 -g
 LDFLAGS = 

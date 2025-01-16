@@ -224,6 +224,13 @@
 # define BC_Z_PERIODIC
 # define BC_Z_ALREADY
 #endif
+//Check MPI for UMBRELLA SWAP
+#ifdef WITH_UMBRELLA
+#ifndef WITH_MPI
+#   error (WITH_UMBRELLA) WITH_MPI must be defined!
+#endif
+#endif
+
 
 
 #endif /* CHECK_OPTIONS_H */

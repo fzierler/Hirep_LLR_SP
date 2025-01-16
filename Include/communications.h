@@ -28,6 +28,8 @@ void complete_gf_sendrecv_flt(suNg_field_flt *gf);
 void start_gf_sendrecv_flt(suNg_field_flt *gf);
 void complete_sf_sendrecv_flt(spinor_field_flt *gf);
 void start_sf_sendrecv_flt(spinor_field_flt *gf);
-
+#ifdef WITH_UMBRELLA
+void umbrella_swap(double* S_llr,double* S0, double* a, double* dS, double* starta);
+#endif
 
 #endif /* COMMUNICATIONS_H */

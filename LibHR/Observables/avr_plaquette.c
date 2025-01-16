@@ -88,6 +88,86 @@ void cplaq(complex *ret,int ix,int mu,int nu)
 
 }
 
+double temporal_plaquette()
+{
+  double pa=0.;
+
+  _PIECE_FOR(&glattice,ixp) {
+    if(ixp==glattice.inner_master_pieces) {
+      _OMP_PRAGMA( master )
+      /* wait for gauge field to be transfered */
+      complete_gf_sendrecv(u_gauge);
+      _OMP_PRAGMA( barrier )
+    }
+    _SITE_FOR_SUM(&glattice,ixp,ix,pa) {
+      pa+=plaq(ix,1,0);
+      pa+=plaq(ix,2,0);
+      pa+=plaq(ix,3,0);
+    }
+  }
+
+  global_sum(&pa, 1);
+
+  return pa/(3.*NG)/GLB_VOLUME;
+
+}
+
+
+
+
+
+double temporal_plaquette_dir(int dir)
+{
+  double pa=0.;
+
+  _PIECE_FOR(&glattice,ixp) {
+    if(ixp==glattice.inner_master_pieces) {
+      _OMP_PRAGMA( master )
+      /* wait for gauge field to be transfered */
+      complete_gf_sendrecv(u_gauge);
+      _OMP_PRAGMA( barrier )
+    }
+    _SITE_FOR_SUM(&glattice,ixp,ix,pa) {
+      pa+=plaq(ix,dir,0);
+    }
+  }
+
+  global_sum(&pa, 1);
+
+  return pa/(double)(NG)/GLB_VOLUME;
+
+}
+
+
+
+
+
+double spatial_plaquette()
+{
+  double pa=0.;
+
+  _PIECE_FOR(&glattice,ixp) {
+    if(ixp==glattice.inner_master_pieces) {
+      _OMP_PRAGMA( master )
+      /* wait for gauge field to be transfered */
+      complete_gf_sendrecv(u_gauge);
+      _OMP_PRAGMA( barrier )
+    }
+    _SITE_FOR_SUM(&glattice,ixp,ix,pa) {
+      pa+=plaq(ix,2,1);
+      pa+=plaq(ix,3,1);
+      pa+=plaq(ix,3,2);
+    }
+  }
+
+  global_sum(&pa, 1);
+
+  return pa/(3.*NG)/GLB_VOLUME;
+
+}
+
+
+
 
 double avr_plaquette()
 {
@@ -239,4 +319,30 @@ void full_momenta(suNg_av_field *momenta){
   }  
   lprintf("MOMENTA",0,"%1.8g\n",mom);
   free_sfield(la);
+}
+
+
+double spatial_wall_plaq(int it)
+{
+  double pa=0.0;
+  int g[4];
+  int coord_zero[4],ix;
+  origin_coord(coord_zero);
+
+  if(coord_zero[0] <= it && coord_zero[0]+T > it){
+  g[0]= it - coord_zero[0];
+  
+  for(g[3]=0;g[3]<Z;g[3]++)
+    for(g[2]=0;g[2]<Y;g[2]++)
+      for(g[1]=0;g[1]<X;g[1]++){
+	ix=ipt(g[0],g[1],g[2],g[3]);
+	pa+=plaq(ix,2,1);
+	pa+=plaq(ix,3,1);
+	pa+=plaq(ix,3,2);
+      }
+  }
+
+  global_sum(&pa,1);
+  
+  return pa;
 }

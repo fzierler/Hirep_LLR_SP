@@ -13,35 +13,34 @@
 #include "observables.h"
 #include <stdlib.h>
 
-void pg_init_traj(const struct _monomial *m)
+void llr_gauge_init_traj(const struct _monomial *m)
 {
   /* empty */
 }
 
-void pg_gaussian_pf(const struct _monomial *m)
+void llr_gauge_gaussian_pf(const struct _monomial *m)
 {
   /* empty */
 }
 
-void pg_correct_pf(const struct _monomial *m)
+void llr_gauge_correct_pf(const struct _monomial *m)
 {
   /* empty */
 }
 
-void pg_correct_la_pf(const struct _monomial *m)
+void llr_gauge_correct_la_pf(const struct _monomial *m)
 {
   /* empty */
 }
 
-const spinor_field *pg_pseudofermion(const struct _monomial *m)
+const spinor_field *llr_gauge_pseudofermion(const struct _monomial *m)
 {
   return NULL;
 }
 
-void pg_add_local_action(const struct _monomial *m, scalar_field *loc_action)
+void llr_gauge_add_local_action(const struct _monomial *m, scalar_field *loc_action)
 {
   mon_pg_par *par = (mon_pg_par *)(m->data.par);
-
   /* Gauge action */
   _MASTER_FOR(&glattice, i)
   {
@@ -49,17 +48,17 @@ void pg_add_local_action(const struct _monomial *m, scalar_field *loc_action)
   }
 }
 
-void pg_free(struct _monomial *m)
+void llr_gauge_free(struct _monomial *m)
 {
-  mon_pg_par *par = (mon_pg_par *)m->data.par;
+   mon_pg_par *par = (mon_pg_par *)m->data.par;
   free(par);
   free(m);
-}
+  }
 
-struct _monomial *pg_create(const monomial_data *data)
+struct _monomial *llr_gauge_create(const monomial_data *data)
 {
   monomial *m = malloc(sizeof(*m));
-  mon_pg_par *par = (mon_pg_par *)(data->par);
+  mon_pg_par *par = (mon_pg_par *)data->par;
 
   // Copy data structure
   m->data = *data;
@@ -71,17 +70,18 @@ struct _monomial *pg_create(const monomial_data *data)
   /* empty */
 
   // Setup pointers to update functions
-  m->free = &pg_free;
+  m->free = &llr_gauge_free;
 
-  m->force_f = &force0;
+  m->force_and_action_f = &force_llr_0;
   m->force_par = &par->beta;
 
-  m->pseudofermion = &pg_pseudofermion;
-  m->init_traj = &pg_init_traj;
-  m->gaussian_pf = &pg_gaussian_pf;
-  m->correct_pf = &pg_correct_pf;
-  m->correct_la_pf = &pg_correct_la_pf;
-  m->add_local_action = &pg_add_local_action;
+  m->pseudofermion = &llr_gauge_pseudofermion;
+  m->init_traj = &llr_gauge_init_traj;
+  m->gaussian_pf = &llr_gauge_gaussian_pf;
+  m->correct_pf = &llr_gauge_correct_pf;
+  m->correct_la_pf = &llr_gauge_correct_la_pf;
+  m->add_local_action = &llr_gauge_add_local_action;
+  m->add_llr_local_action = &llr_gauge_add_local_action;
 
   return m;
 }

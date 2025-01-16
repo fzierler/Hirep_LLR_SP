@@ -22,7 +22,6 @@
 #include <math.h>
 
 
-static double static_mass=0.;
 static double static_mu=0.;
 
 
@@ -35,6 +34,9 @@ static spinor_field *Xs=NULL, *Ys=NULL, *eta=NULL;
 static spinor_field *xi=NULL;
 #endif 
 
+inline spinor_field * get_hmc_spinor_Xs(){
+  return Xs;
+  };
 
 void free_force_hmc();
 
@@ -82,7 +84,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
   init_force_hmc();
   set_dirac_mass(par->mass);
   set_twisted_mass(par->mu);
-
+  //double ret=0.0;  
 
   /* check input types */
   _TWO_SPINORS_MATCHING(u_gauge,force);
@@ -138,7 +140,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     else{
       force_fermion_core(Xs,Ys,force,dt*par->b,forcestat,0);
     }
-
+  //ret=spinor_field_sqnorm_f(Xs);
 #else
 
     double tmp;
@@ -243,5 +245,6 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
   lprintf("FORCE_HMC",20,"avr dt |force| = %1.8e dt maxforce = %1.8e, dt = %1.8e \n",forcestat[0],forcestat[1],dt);
   n_inv_iter[par->id-1]+=n_iters;
 #endif
+
 }
 
