@@ -72,9 +72,9 @@ typedef struct _hmc_flow {
     {"run name", "run name = %s", STRING_T, &((varname).run_name[0])},\
     {"gauge start", "gauge start = %s", STRING_T, &((varname).g_start[0])},\
     {"rm steps", "rm steps = %s", STRING_T, &((varname).last_conf[0])},\
-    {"umbrella freq", "umbrella RM freq = %d", INT_T, &((varname).umb_RM_freq)},\
-    {"umbrella freq", "umbrella meas freq = %d", INT_T, &((varname).umb_meas_freq)},\
-    {"umbrella freq", "umbrella therm freq = %d", INT_T, &((varname).umb_therm_freq)},\
+    {"umbrella RM freq", "umbrella RM freq = %d", INT_T, &((varname).umb_RM_freq)},\
+    {"umbrella meas freq", "umbrella meas freq = %d", INT_T, &((varname).umb_meas_freq)},\
+    {"umbrella therm freq", "umbrella therm freq = %d", INT_T, &((varname).umb_therm_freq)},\
     {"config dir", "config dir = %s", STRING_T, &((varname).conf_dir[0])},\
     {"conf save frequency", "save freq = %d", INT_T, &((varname).save_freq)},\
     {"therm", "therm = %d", INT_T, &((varname).therm)},			\
