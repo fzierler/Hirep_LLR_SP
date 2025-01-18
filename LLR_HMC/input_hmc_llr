@@ -13,7 +13,6 @@ BC_SHIFT_Z=0
 // Replicas
 N_REP = 1
 
-
 // Random generator
 rlx_level = 1
 rlx_seed = 13813
@@ -52,6 +51,9 @@ meas freq = 2
 last conf = +2
 save freq = 1
 
+umbrella RM freq = 1
+umbrella meas freq = 1
+umbrella therm freq = 1
 
 // LLR/RM
 llr:make = true
