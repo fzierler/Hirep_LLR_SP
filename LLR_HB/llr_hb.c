@@ -133,7 +133,7 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"Compiled without domain decomposition \n");
 #endif
 /* Init Monte Carlo */
-  int initial_it;
+
   init_mc(&flow, input_filename);
   if(flow.start < llr_var.it)
   {
@@ -145,7 +145,7 @@ int main(int argc,char *argv[]) {
       llr_var.it = flow.start;
 
   }
-  //initial_it = llr_var.it;
+
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
 
   init_robbinsmonro(llr_var.nmc,llr_var.nth,llr_var.starta,llr_var.it,llr_var.dS,llr_var.S0,llr_var.sfreq_fxa, llr_var.Smin, llr_var.Smax,llr_var.nhb,llr_var.nor, llr_var.it_freq, llr_var.db);
@@ -177,6 +177,7 @@ int main(int argc,char *argv[]) {
       lprintf("MAIN",0,"NR Trajectory #%d...\n",i);
       gettimeofday(&start,0);
       newtonraphson();
+
      //Timing and output data
       gettimeofday(&end,0);
       timeval_subtract(&etime,&end,&start);
@@ -184,29 +185,29 @@ int main(int argc,char *argv[]) {
       lprintf("MAIN",0,"NR Plaq a fixed %lf \n",avr_plaquette());
       lprintf("MAIN",0,"NR <a_rho(%d,%d,%.9f)>= %.9f\n",j,i,getS0(),get_llr_a());
     }
-    //initial_it = llr_var.it;
+
     lprintf("MAIN",0,"Newton Raphson update done.\n");
     lprintf("MAIN", 0, "flow.start: %d, flow.end: %d, llr_var.it: %d \n", flow.start,flow.end, llr_var.it);
     for(i=flow.start;i<flow.end;++i) {
+
       struct timeval start, end, etime; /* //for trajectory timing */
       lprintf("MAIN",0,"Trajectory #%d...\n",i);
       gettimeofday(&start,0);
       robbinsmonro();
-     //Timing and output data
+
+      //Timing and output data
       gettimeofday(&end,0);
       timeval_subtract(&etime,&end,&start);
       lprintf("MAIN",0,"Robbins Monro sequence #%d: generated in [%ld sec %ld usec]\n",i,etime.tv_sec,etime.tv_usec);
       lprintf("MAIN",0,"Plaq a fixed %lf \n",avr_plaquette());
       lprintf("MAIN",0,"<a_rho(%d,%d,%.9f)>= %.9f\n",j,i,getS0(),get_llr_a());
     }
+
     lprintf("MAIN",0,"Robins Monro update done.\n");
     for(i=0;i<llr_var.nfxa;++i) {
       struct timeval start, end, etime; /* //for trajectory timing */
-
       llr_fixed_a_update();
-
-      //lprintf("MAIN",0,"Obs measure for fixed E=%f dE=%f a=%f T\n",getS0(),getdS(),get_llr_a());
-       }
+    }
   }
   /* save final configuration */
   save_conf(&flow, flow.end - 1);
