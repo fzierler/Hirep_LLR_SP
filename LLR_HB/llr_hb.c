@@ -101,7 +101,6 @@ static void read_cmdline(int argc, char* argv[]) {
 int main(int argc,char *argv[]) {
   struct timeval startmain, endmain, etimemain; /* //for trajectory timing */
   gettimeofday(&startmain,0);
-  char sbuf[128];
   int i;
   read_cmdline(argc,argv);
 
@@ -205,7 +204,6 @@ int main(int argc,char *argv[]) {
 
     lprintf("MAIN",0,"Robins Monro update done.\n");
     for(i=0;i<llr_var.nfxa;++i) {
-      struct timeval start, end, etime; /* //for trajectory timing */
       llr_fixed_a_update();
     }
   }
