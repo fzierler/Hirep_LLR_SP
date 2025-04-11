@@ -35,3 +35,9 @@ Pure_Gauge/output
 
 # vim files
 *.un~
+
+# binaries
+llr_hb 
+nr_hb
+suN 
+suN_multilevel
