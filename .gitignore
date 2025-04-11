@@ -32,3 +32,6 @@ NR_HB/output
 LLR_HB/output
 Pure_Gauge/output
 */output
+
+# vim files
+*.un~
