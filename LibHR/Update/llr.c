@@ -46,14 +46,12 @@ static llrparams llrp;
 
 //reset it to 0 and rhoa to initial value
 void restart_robbinsmonro(){
- //llrp.it=8;
   llrp.a=llrp.starta;
 }
 
 void init_robbinsmonro(int nrm,int nth,double starta,int it,double dS,double S0, int sfreq_fxa, double Smin, double Smax, int nhb, int nor, int it_freq, double db){
   llrp.nrm=nrm;
   llrp.nth=nth;
-  //lprintf("llr",0,"nth: %d \n", llrp.nth);
   llrp.it=it;
   llrp.starta=starta;
   llrp.dS=dS;
@@ -69,10 +67,7 @@ void init_robbinsmonro(int nrm,int nth,double starta,int it,double dS,double S0,
   llrp.E = avr_plaquette()*GLB_VOLUME*6.;
   lprintf("MAIN",0,"Bringing the system to the interval (S0,dS) = (%f, %f) ...\n", llrp.S0, llrp.dS);
   int i;
-  //anneal(&(llrp.E), llrp.S0, llrp.dS);
 #ifdef LLRHBPARALLEL
-  //double db = 0.1;
-  //lprintf("MAIN",0,"Bringing the system to the interval (S0,E) = (%f, %f) ...\n", llrp.S0, llrp.E);
   i = anneal_parallel(llrp.starta, db, &(llrp.E),  llrp.S0, llrp.dS);
   if(i == 1){
     lprintf("MAIN",0,"Annealing failed (S0,dS) = (%f, %f) ...\n", llrp.S0, llrp.dS);
