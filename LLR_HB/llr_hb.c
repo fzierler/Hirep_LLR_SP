@@ -139,14 +139,8 @@ int main(int argc,char *argv[]) {
       flow.end = llr_var.it + (flow.end - flow.start);
       flow.start = llr_var.it;
   }
-  else
-  {
-      llr_var.it = flow.start;
-
-  }
 
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
-
   init_robbinsmonro(llr_var.nmc,llr_var.nth,llr_var.starta,llr_var.it,llr_var.dS,llr_var.S0,llr_var.sfreq_fxa, llr_var.Smin, llr_var.Smax,llr_var.nhb,llr_var.nor, llr_var.it_freq, llr_var.db);
 
 
@@ -208,7 +202,7 @@ int main(int argc,char *argv[]) {
     }
   }
   /* save final configuration */
-  save_conf(&flow, flow.end - 1);
+  save_conf(&flow, flow.end);
   ///* Only save state if we have a file to save to */
   if(rlx_var.rlxd_state[0]!='\0') {
     lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
