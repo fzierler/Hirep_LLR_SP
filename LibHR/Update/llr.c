@@ -206,8 +206,6 @@ void newtonraphson(void){
     avr_sq += ((llrp.E-llrp.S0 )*( llrp.E- llrp.S0))/ (double)llrp.nrm;
 #endif
   }
-  //avr/=(double)llrp.nrm;
-  //avr_sq /=(double)llrp.nrm;
   lprintf("NEWTONRAPHSON",10,"RM avr-S0: %lf delta_a: %lf \n",avr-llrp.S0,(avr-llrp.S0)*12./(llrp.dS*llrp.dS) );
   lprintf("NEWTONRAPHSON",10,"RM var(S - S0): %lf \n",avr_sq - ((avr - llrp.S0)*(avr-llrp.S0)));
   llrp.a-=(avr-llrp.S0)*12./(llrp.dS*llrp.dS);
@@ -216,12 +214,11 @@ void newtonraphson(void){
   umbrella_swap(&(llrp.E),&llrp.S0,&llrp.a,&llrp.dS);
 #endif
 #endif
-//  llrp.it++;
+  // Note, that we do not increase the iteration number of NR updates
   llrp.E = avr_plaquette()*GLB_VOLUME*6.; 
 }
 
 void robbinsmonro(void){
-//  lprintf("llr",0,"Here 0 \n");
   int rmstep;
 #ifdef LLRHB
   double Emin, Emax;
@@ -235,62 +232,45 @@ void robbinsmonro(void){
   if(fabs(llrp.S0 - llrp.Smax) < epsilon){
     Emax = 6*GLB_VOLUME;
   }
-//lprintf("llr",0,"Here 1 \n");
 #endif
 #else
   double S_llr;
   double S_non_llr;
 #endif
-// lprintf("llr",0,"Energy range Emin: %f, Emax: %f \n", Emin, Emax);
-//lprintf("llr",0,"nth: %d \n", llrp.nth);
   for(rmstep=0;rmstep<llrp.nth;rmstep++){
-    //lprintf("llr",30,"Therm: %d\n",rmstep);
 #ifdef LLRHB
-  //lprintf("llr",0,"%d",rmstep);
 #ifdef LLRHBPARALLEL
-        update_constrained_parallel(llrp.a, llrp.nhb,llrp.nor, &(llrp.E),Emin,Emax);
+    update_constrained_parallel(llrp.a, llrp.nhb,llrp.nor, &(llrp.E),Emin,Emax);
 #else
-        update_constrained(llrp.a, llrp.nhb,llrp.nor, &(llrp.E),Emin,Emax);
+    update_constrained(llrp.a, llrp.nhb,llrp.nor, &(llrp.E),Emin,Emax);
 #endif
 #else
-  update_llr_ghmc(&S_llr,&S_non_llr,1);
+    update_llr_ghmc(&S_llr,&S_non_llr,1);
 #endif
-
   }
-  //lprintf("llr",0,"Here 1 \n");
+
   double avr=0.;
   double avr_sq= 0.;
   for(rmstep=0;rmstep<llrp.nrm;rmstep++){
 #ifdef LLRHB
 #ifdef LLRHBPARALLEL
-        update_constrained_parallel(llrp.a, llrp.nhb,llrp.nor, &(llrp.E),Emin,Emax);
+    update_constrained_parallel(llrp.a, llrp.nhb,llrp.nor, &(llrp.E),Emin,Emax);
 #else
-        update_constrained(llrp.a, llrp.nhb,llrp.nor, &(llrp.E),Emin,Emax);
+    update_constrained(llrp.a, llrp.nhb,llrp.nor, &(llrp.E),Emin,Emax);
 #endif
     avr += llrp.E/ (double)llrp.nrm;
     avr_sq += ((llrp.E-llrp.S0 )*( llrp.E- llrp.S0))/ (double)llrp.nrm;
-    //lprintf("ROBBINSMONRO",0,"RM Step: %d, i: %d, E=%lf, avr=%lf  \n",llrp.it,rmstep,llrp.E, avr);
-    //if( rmstep%100 ==0 ) umbrella_swap(&(llrp.E),&llrp.S0,&llrp.a,&llrp.dS);
 #else
     update_llr_ghmc(&S_llr,&S_non_llr,0);
     avr+=S_llr/(double)llrp.nrm;
-    //avr_sq += (S_llr * S_llr)/ (double)llrp.nrm;
-
-    //if( rmstep%100 ==0 ) umbrella_swap(&S_llr,&llrp.S0,&llrp.a,&llrp.dS);
-    //lprintf("ROBBINSMONRO",10,"RM Step: %d GMC Iter: %d S_llr=%lf \n",llrp.it,rmstep,S_llr);
 #endif
-
   }
-//lprintf("llr",0,"Here 2 \n");
-  //avr/=(double)llrp.nrm;
-  //avr_sq /= (double)llrp.nrm;
   int n; 
   if(llrp.it_freq != 0){
      n = llrp.it / llrp.it_freq;
   }else{
      n = 1;
   }
-//lprintf("llr",0,"Here 3 \n");
 #ifdef WITH_UMBRELLA
   lprintf("ROBBINSMONRO",10,"(S-S0)_sqr: %lf \n",avr_sq);
   if((llrp.S0 == llrp.Smin)||(llrp.S0 == llrp.Smax)){
@@ -302,21 +282,16 @@ void robbinsmonro(void){
   }
 #else
   lprintf("ROBBINSMONRO",10,"RM avr-S0: %lf delta_a: %lf \n",avr-llrp.S0,(avr-llrp.S0)*12./(llrp.dS*llrp.dS*llrp.it) );
-  //llrp.a-=(avr-llrp.S0)*12./(llrp.dS*llrp.dS);
   llrp.a-=(avr-llrp.S0)*12./(llrp.dS*llrp.dS*n);
 #endif
 #ifdef WITH_UMBRELLA
 #ifdef LLRHB
-  //lprintf("ROBBINSMONRO",10,"Emin=%lf E=%lf Emax = %lf\n",Emin,llrp.E,Emax);
   umbrella_swap(&(llrp.E),&llrp.S0,&llrp.a,&llrp.dS);
- // if( rmstep%100 ==0 ) umbrella_swap(&(llrp.E),&llrp.S0,&llrp.a,&llrp.dS);
 #else
   umbrella_swap(&S_llr,&llrp.S0,&llrp.a,&llrp.dS);
 #endif
 #endif
-  //lprintf("ROBBINSMONRO",0,"llrp.it : %d  \n",llrp.it);
   llrp.it++;
-  //lprintf("Action",0,"S_llr = %f, S_avrplaq = %f \n",llrp.E, avr_plaquette()*GLB_VOLUME*6.);
   llrp.E = avr_plaquette()*GLB_VOLUME*6.; 
 }
 

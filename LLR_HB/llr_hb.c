@@ -31,8 +31,6 @@
 #include "llr_hb_utils.h"
 #include "cinfo.c"
 #include "setup.h"
-//#include "wilsonflow.h"
-
 
 /* LLR parameters */
 typedef struct _input_llr {
@@ -42,7 +40,6 @@ typedef struct _input_llr {
   /* for the reading function */
   input_record_t read[17];
 } input_llr;
-
 
 #define init_input_llr(varname) \
   { \
@@ -96,8 +93,6 @@ static void read_cmdline(int argc, char* argv[]) {
   if (ai!=0) strcpy(input_filename,argv[ai]);
 }
 
-
-
 int main(int argc,char *argv[]) {
   struct timeval startmain, endmain, etimemain; /* //for trajectory timing */
   gettimeofday(&startmain,0);
@@ -142,7 +137,6 @@ int main(int argc,char *argv[]) {
 
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
   init_robbinsmonro(llr_var.nmc,llr_var.nth,llr_var.starta,llr_var.it,llr_var.dS,llr_var.S0,llr_var.sfreq_fxa, llr_var.Smin, llr_var.Smax,llr_var.nhb,llr_var.nor, llr_var.it_freq, llr_var.db);
-
 
   for(int j=0;j<flow.rmrestart;++j) {
 
@@ -214,10 +208,7 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"Total simulation time =[%ld sec %ld usec]\n",etimemain.tv_sec,etimemain.tv_usec);
   /* finalize Monte Carlo */
   end_mc();
-
   /* close communications */
   finalize_process();
-
   return 0;
-
 }
