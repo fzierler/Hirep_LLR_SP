@@ -269,7 +269,8 @@ void robbinsmonro(void){
   if(llrp.it_freq != 0){
      n = llrp.it / llrp.it_freq;
   }else{
-     n = 1;
+    lprintf("WARNING", 0, "LLR update frequency is set to 0. It will be set to 1.\n");
+    n = llrp.it;
   }
 #ifdef WITH_UMBRELLA
   lprintf("ROBBINSMONRO",10,"(S-S0)_sqr: %lf \n",avr_sq);
