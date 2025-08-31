@@ -1,3 +1,0 @@
-[submodule "llr_hb_input_generator"]
-	path = LLR_HB/LLR_HiRep_heatbath_input
-	url = https://github.com/fzierler/LLR_HiRep_heatbath_input
