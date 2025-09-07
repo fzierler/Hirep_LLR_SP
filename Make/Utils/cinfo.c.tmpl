@@ -23,6 +23,9 @@ void print_compiling_info() {
   printf("%s",CI_gcc);
 }
 
+void print_git_info_log() {
+  lprintf("SYSTEM",0,"git commit id:%s\n",CI_gitrevision);
+}
 
 void print_compiling_info_short() {
   lprintf("SYSTEM",0,"MACROS=%s",MACROS);

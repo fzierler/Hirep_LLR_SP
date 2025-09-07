@@ -107,6 +107,7 @@ int main(int argc,char *argv[]) {
   /* read input for llr update */
   read_input(llr_var.read,input_filename);
 
+  print_git_info_log();
   lprintf("MAIN",0,"LLR number of mc steps per RM: %d\n",llr_var.nmc);
   lprintf("MAIN",0,"LLR number of therm steps per RM %d\n",llr_var.nth);
   lprintf("MAIN",0,"LLR Initial a %f\n",llr_var.starta);
