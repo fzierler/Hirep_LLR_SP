@@ -65,7 +65,8 @@ llr:it = 10
 llr:starta = 5.910
 llr:dS = 43.
 llr:S0 = 20463.7
- 
+llr:meas_print_freq = 1
+
 //Wilson flow parameters
 //WF:make = false
 //WF:tmax = 2.0

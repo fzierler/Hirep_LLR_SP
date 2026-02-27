@@ -35,10 +35,10 @@
 /* LLR parameters */
 typedef struct _input_llr {
   char make[256];
-  int nmc,nth,it, nfxa, sfreq_fxa, nhb, nor, it_freq, N_nr;
+  int nmc,nth,it, nfxa, sfreq_fxa, nhb, nor, it_freq, N_nr, meas_print_freq;
   double starta,S0,dS, Smin, Smax, db;
   /* for the reading function */
-  input_record_t read[17];
+  input_record_t read[18];
 } input_llr;
 
 #define init_input_llr(varname) \
@@ -60,6 +60,7 @@ typedef struct _input_llr {
     {"Suppresion factor increment frequency ", "llr:it_freq = %d", INT_T, &((varname).it_freq)},  \
     {"Number of intial NR iterations  ", "llr:N_nr = %d", INT_T, &((varname).N_nr)},  \
     {"Change in beta for annealing ", "llr:db = %lf", DOUBLE_T, &((varname).db)},  \
+    {"Verbosity for printing E in double-bracket thermalisation and measurement", "llr:meas_print_freq = %d", INT_T, &((varname).meas_print_freq)},  \
     {NULL, NULL, 0, NULL}				\
     }\
 }
@@ -122,6 +123,7 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"LLR Delta S %f\n",llr_var.dS);
   lprintf("MAIN",0,"LLR dB %f\n",llr_var.db);
   lprintf("MAIN",0,"LLR number of intial NR iterations %d\n",llr_var.N_nr);
+  lprintf("MAIN",0,"LLR logging frequency for double bracket measurement %d\n",llr_var.meas_print_freq);
 #ifdef LLRHBPARALLEL
   lprintf("MAIN",0,"Compiled with domain decomposition \n");
 #else
@@ -137,7 +139,7 @@ int main(int argc,char *argv[]) {
   }
 
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
-  init_robbinsmonro(llr_var.nmc,llr_var.nth,llr_var.starta,llr_var.it,llr_var.dS,llr_var.S0,llr_var.sfreq_fxa, llr_var.Smin, llr_var.Smax,llr_var.nhb,llr_var.nor, llr_var.it_freq, llr_var.db);
+  init_robbinsmonro(llr_var.nmc,llr_var.nth,llr_var.starta,llr_var.it,llr_var.dS,llr_var.S0,llr_var.sfreq_fxa, llr_var.Smin, llr_var.Smax,llr_var.nhb,llr_var.nor, llr_var.it_freq, llr_var.db, llr_var.meas_print_freq);
 
   for(int j=0;j<flow.rmrestart;++j) {
 
